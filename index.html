@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그래작은도서관</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FDFBF7; --text-main: #2C2A29; --text-muted: #7A7571;
+            --color-terracotta: #E2725B; --color-sage: #9DC183; --color-mustard: #FFDB58; --border-color: #E6E2DA;
+        }
+        body {
+            margin: 0; padding: 0; font-family: 'Gowun Batang', serif;
+            background-color: var(--bg-cream); color: var(--text-main);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+        header { text-align: center; margin-bottom: 20px; position: relative; }
+        
+        .title-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; }
+        .lib-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-sage); }
+        h1 { color: var(--color-terracotta); font-size: 28px; margin: 0; }
+        
+        .search-container { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; align-items: center; }
+        .search-bar { flex-grow: 1; padding: 15px 20px; font-family: 'Gowun Batang', serif; font-size: 16px; border: 2px solid var(--color-sage); border-radius: 30px; box-sizing: border-box; outline: none; transition: border-color 0.3s; }
+        .search-bar:focus { border-color: var(--color-terracotta); }
+        .icon-btn { background-color: var(--color-sage); color: #fff; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .filter-panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .filter-row { display: flex; gap: 10px; margin-top: 10px; }
+        .filter-select { flex: 1; padding: 10px; font-family: 'Gowun Batang', serif; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; outline: none; background-color: #fafafa; }
+
+        .new-books-banner { width: 100%; margin: 10px 0 20px 0; text-align: center; display: block; }
+        .new-books-banner img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #fff; }
+
+        #loading { text-align: center; padding: 30px 10px; font-family: 'Gowun Batang', serif; display: none; }
+        .admin-btn { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); z-index: 10; }
+        
+        .gallery-view { display: none !important; }
+        .list-view { display: none; flex-direction: column; flex-grow: 1; margin-top: 10px; }
+        .list-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        
+        footer { text-align: center; padding: 40px 0 20px; margin-top: auto; display: flex; justify-content: center; gap: 10px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 12px; width: 350px; max-width: 90%; text-align: center; position: relative; }
+        .submit-btn { background-color: var(--color-sage); color: #fff; border: none; padding: 14px; border-radius: 6px; cursor: pointer; width: 100%; font-family: 'Gowun Batang'; font-size: 16px; transition: opacity 0.3s; }
+        .submit-btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="admin-btn" onclick="openModal('loginModal')">⚙️</button>
+            <div class="title-wrapper">
+                <img src="grae.jpg" alt="로고" class="lib-logo">
+                <h1>그래작은도서관</h1>
+            </div>
+            
+            <div id="defaultSearchMode" class="search-container">
+                <input type="text" id="searchInput" class="search-bar" placeholder="책 제목이나 작가를 검색해보세요...">
+                <button class="icon-btn" onclick="toggleFilterMode(true)" title="필터 열기">🎛️</button>
+            </div>
+
+            <div id="filterSearchMode" class="filter-panel" style="display: none;">
+                <div class="search-container" style="margin-bottom: 0;">
+                    <input type="text" id="filterInput" class="search-bar" placeholder="검색어 입력 (필터만 적용 가능)">
+                    <button class="icon-btn" onclick="executeFilterSearch()" style="background-color: var(--color-terracotta);" title="검색">🔍</button>
+                    <button class="icon-btn" onclick="toggleFilterMode(false)" style="background-color: #ccc;" title="기본 검색으로 돌아가기">✖️</button>
+                </div>
+                <div class="filter-row">
+                    <select id="sectionFilter" class="filter-select">
+                        <option value="all">모든 대상</option>
+                        <option value="유">유아/어린이(유,아)</option>
+                        <option value="청">청소년(청)</option>
+                        <option value="성">성인(성)</option>
+                        <option value="만">만화(만)</option>
+                    </select>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="latest">최신 등록순</option>
+                        <option value="title">가나다순</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div id="newBooksBanner" class="new-books-banner">
+                <img src="new_books.jpg" alt="그래도서관 신간 도서">
+            </div>
+
+            <div id="loading"><span style="color:var(--color-terracotta); font-weight:bold;">검색 중...</span></div>
+            
+            <div id="listView" class="list-view"></div>
+        </main>
+        <footer>
+            <button class="submit-btn" style="width:auto; padding:10px 20px; background-color:#03C75A;" onclick="window.open('https://band.us/@graelib', '_blank')">📗 도서관 밴드</button>
+            <button class="submit-btn" style="width:auto; padding:10px 20px;" onclick="openModal('requestModal')">📖 없는 책 신청</button>
+        </footer>
+    </div>
+
+    <div id="requestModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color: var(--color-terracotta); font-size: 20px; margin-top:10px;">희망 도서 신청</h2>
+            <p style="font-size: 13px; color: gray; margin-bottom:15px; word-break:keep-all;">도서관 소장 여부 확인을 위해 책 제목을 먼저 입력해주세요.</p>
+            <input type="text" id="checkTitle" placeholder="정확한 책 제목 입력" style="width:100%; padding:12px; margin-bottom:12px; box-sizing:border-box; border: 1px solid var(--border-color); border-radius:6px;">
+            <button class="submit-btn" onclick="checkDuplicate()">소장 여부 확인</button>
+            <button onclick="closeModal('requestModal')" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; font-size:13px;">닫기</button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-top:10px;">관리자 안내</h2>
+            <p style="font-size: 14px; color: gray; line-height:1.5;">도서 목록 수정은 <b>구글 스프레드시트</b>에서 하세요.<br>신간 이미지를 바꾸려면 컴퓨터에서 파일을 다시 올려야 합니다.</p>
+            <button class="submit-btn" onclick="location.reload()">새로고침 (업데이트 확인)</button>
+            <button onclick="closeModal('loginModal')" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; font-size:13px;">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmothB8t-881cVm2ymwjRxDur7JYJnxNmtcD6rYQ2XCzErkX88rhyg2B69lZ9r_Jr7zq2-bETNT5D5/pub?output=csv";
+        const GOOGLE_FORM_URL = "https://forms.gle/LRqP8GQPq4cDbWBdA";
+        
+        let booksData = [];
+        const loadingDiv = document.getElementById('loading');
+        const bannerDiv = document.getElementById('newBooksBanner');
+        const listDiv = document.getElementById('listView');
+
+        function parseRowSafe(row) {
+            let res = [], inQ = false, cur = "";
+            for(let c of row) {
+                if(c === '"') inQ = !inQ;
+                else if(c === ',' && !inQ) { res.push(cur.trim().replace(/^"|"$/g, '')); cur = ""; }
+                else cur += c;
+            }
+            res.push(cur.trim().replace(/^"|"$/g, ''));
+            return res;
+        }
+
+        // [핵심 수정] 빈칸(undefined)일 경우 텍스트로 안전하게 변환하는 함수
+        function getSafeStr(colsArray, index, defaultText = "") {
+            if (index !== -1 && colsArray[index] !== undefined && colsArray[index] !== null) {
+                return String(colsArray[index]);
+            }
+            return defaultText;
+        }
+
+        async function init() {
+            try {
+                const response = await fetch(SHEET_CSV_URL + "&timestamp=" + new Date().getTime());
+                if (!response.ok) throw new Error("네트워크 오류");
+                const csvText = await response.text();
+                const cleanText = csvText.replace(/^\ufeff/, '').replace(/\r/g, '');
+                const rows = cleanText.split('\n').filter(r => r.trim() !== '');
+                if(rows.length < 2) throw new Error("데이터 없음");
+
+                const headers = parseRowSafe(rows[0]);
+                const colIdx = {
+                    title: headers.findIndex(h => h === '서명' || h === '도서명'),
+                    author: headers.findIndex(h => h === '저자' || h === '작가'),
+                    publisher: headers.findIndex(h => h === '출판사'),
+                    year: headers.findIndex(h => h === '출판년도'),
+                    secCode: headers.findIndex(h => h === '별치기호'),
+                    classCode: headers.findIndex(h => h === '분류기호'),
+                    authorCode: headers.findIndex(h => h === '저자기호'),
+                    volCode: headers.findIndex(h => h === '청구권차'),
+                    copyCode: headers.findIndex(h => h === '복본기호'),
+                    regDate: headers.findIndex(h => h === '등록일')
+                };
+
+                for(let i = 1; i < rows.length; i++) {
+                    const cols = parseRowSafe(rows[i]);
+                    if (cols.length < 3) continue;
+
+                    let callNumArr = [];
+                    const sec = getSafeStr(cols, colIdx.secCode);
+                    const cls = getSafeStr(cols, colIdx.classCode);
+                    const auth = getSafeStr(cols, colIdx.authorCode);
+                    const vol = getSafeStr(cols, colIdx.volCode);
+                    const cop = getSafeStr(cols, colIdx.copyCode);
+
+                    if(sec) callNumArr.push(sec);
+                    if(cls) callNumArr.push(cls);
+                    if(auth) callNumArr.push(auth);
+                    if(vol) callNumArr.push(/^[0-9]+$/.test(vol) ? "v." + vol : vol);
+                    if(cop) callNumArr.push(/^[0-9]+$/.test(cop) ? "c." + cop : cop);
+
+                    // undefined 방지 처리 적용
+                    booksData.push({
+                        title: getSafeStr(cols, colIdx.title, '제목없음'),
+                        author: getSafeStr(cols, colIdx.author, '작가불명'),
+                        publisher: getSafeStr(cols, colIdx.publisher),
+                        year: getSafeStr(cols, colIdx.year),
+                        callNum: callNumArr.join(' ') || '기호없음',
+                        secCode: sec,
+                        regDate: getSafeStr(cols, colIdx.regDate)
+                    });
+                }
+            } catch (err) {
+                console.error("데이터 로딩 실패:", err);
+            }
+        }
+
+        function toggleFilterMode(show) {
+            document.getElementById('defaultSearchMode').style.display = show ? 'none' : 'flex';
+            document.getElementById('filterSearchMode').style.display = show ? 'block' : 'none';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterInput').value = '';
+            bannerDiv.style.display = 'block';
+            listDiv.style.display = 'none';
+        }
+
+        function renderResults(filtered) {
+            listDiv.innerHTML = '';
+            if (filtered.length === 0) {
+                listDiv.innerHTML = '<div style="text-align:center; padding:30px; color:gray; font-size:15px; word-break:keep-all;">검색 결과가 없습니다.<br>맨 아래 버튼을 눌러 신청해주세요!</div>';
+                return;
+            }
+
+            filtered.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">${b.title}</div>
+                    <div style="font-size:13px; color:gray; margin-bottom:8px;">${b.author} | ${b.publisher} | ${b.year}</div>
+                    <div style="font-size:14px; color:var(--color-terracotta); font-weight:bold;">🔖 ${b.callNum}</div>
+                `;
+                listDiv.appendChild(item);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const kw = e.target.value.replace(/\s+/g, '').toLowerCase();
+            if (!kw) {
+                bannerDiv.style.display = 'block';
+                listDiv.style.display = 'none';
+                return;
+            }
+            bannerDiv.style.display = 'none';
+            listDiv.style.display = 'flex';
+            
+            const filtered = booksData.filter(b => b.title.replace(/\s+/g, '').toLowerCase().includes(kw) || b.author.replace(/\s+/g, '').toLowerCase().includes(kw));
+            renderResults(filtered);
+        });
+
+        function executeFilterSearch() {
+            const kw = document.getElementById('filterInput').value.replace(/\s+/g, '').toLowerCase();
+            const section = document.getElementById('sectionFilter').value;
+            const sortType = document.getElementById('sortFilter').value;
+            
+            bannerDiv.style.display = 'none';
+            listDiv.style.display = 'flex';
+
+            if (booksData.length === 0) {
+                listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:red; font-size:14px;">데이터 로딩 오류. 새로고침 해주세요.</div>';
+                return;
+            }
+
+            let filtered = booksData.filter(b => {
+                const matchKw = !kw || b.title.replace(/\s+/g, '').toLowerCase().includes(kw) || b.author.replace(/\s+/g, '').toLowerCase().includes(kw);
+                
+                let matchSec = true;
+                if (section !== 'all') {
+                    if (section === '유') {
+                        matchSec = b.secCode.includes('유') || b.secCode.includes('아');
+                    } else {
+                        matchSec = b.secCode.includes(section);
+                    }
+                }
+                return matchKw && matchSec;
+            });
+
+            filtered.sort((a, b) => {
+                if (sortType === 'latest') {
+                    if (a.regDate !== b.regDate) {
+                        return b.regDate.localeCompare(a.regDate); // 최신이 위로
+                    }
+                    return a.title.localeCompare(b.title);
+                } else {
+                    return a.title.localeCompare(b.title);
+                }
+            });
+
+            renderResults(filtered);
+        }
+
+        function checkDuplicate() {
+            const title = document.getElementById('checkTitle').value.replace(/\s+/g, '').toLowerCase();
+            if(!title) return alert("책 제목을 입력해주세요.");
+            if(booksData.length === 0) return alert("도서 목록을 확인 중입니다. 잠시 후 다시 시도해주세요.");
+            
+            const isDup = booksData.some(b => b.title.replace(/\s+/g, '').toLowerCase() === title);
+            if(isDup) {
+                alert("📢 우리 도서관에 이미 소장 중인 책입니다!\\n검색창에서 검색하여 분류 번호를 확인해보세요.");
+            } else {
+                alert("✅ 도서관에 없는 책입니다!\\n신청서 페이지(구글 폼)로 이동합니다.");
+                window.open(GOOGLE_FORM_URL, "_blank");
+                closeModal('requestModal');
+                document.getElementById('checkTitle').value = '';
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        init();
+    </script>
+</body>
+</html>
