@@ -1155,7 +1155,17 @@ function runFilter() {
   const audience = document.getElementById('filter-audience').value;
   const sort     = document.getElementById('filter-sort').value;
 
-  if (!q && !audience && !selectedKdc) { showInitial(); return; }
+  // 아무 조건도 없으면 전체 최신순 표시
+  if (!q && !audience && !selectedKdc) {
+    const all = [...allBooks].sort((a, b) => {
+      if (!a.regDate && !b.regDate) return 0;
+      if (!a.regDate) return 1;
+      if (!b.regDate) return -1;
+      return b.regDate - a.regDate;
+    });
+    renderBooks(all, '');
+    return;
+  }
 
   let filtered = allBooks.filter(b => {
     const matchQ = !q || (
