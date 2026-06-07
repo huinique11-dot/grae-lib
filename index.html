@@ -1075,10 +1075,17 @@ function onMainSearch() {
   debounceTimer = setTimeout(() => {
     lastQuery = q;
     const lower = q.toLowerCase();
-    const filtered = allBooks.filter(b =>
-      b.title.toLowerCase().includes(lower) ||
-      b.author.toLowerCase().includes(lower)
-    );
+    const filtered = allBooks
+      .filter(b =>
+        b.title.toLowerCase().includes(lower) ||
+        b.author.toLowerCase().includes(lower)
+      )
+      .sort((a, b) => {
+        if (!a.regDate && !b.regDate) return 0;
+        if (!a.regDate) return 1;
+        if (!b.regDate) return -1;
+        return b.regDate - a.regDate;
+      });
     renderBooks(filtered, q);
   }, 200);
 }
