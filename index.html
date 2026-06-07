@@ -1102,7 +1102,7 @@ function renderDonut(containerId, items, total, showTotal) {
   let hoveredIdx = null;
 
   function updateCenter() {
-    const item = hoveredIdx !== null ? items[hoveredIdx] : null;
+    const item = hoveredIdx !== null ? segs[hoveredIdx] : null;
     const lblEl   = wrap.querySelector('.dc-lbl');
     const cntEl   = wrap.querySelector('.dc-cnt');
     const subEl   = wrap.querySelector('.dc-sub');
