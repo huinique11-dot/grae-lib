@@ -811,7 +811,8 @@
       🔗 스프레드시트 링크:<br/>
       <a href="https://docs.google.com/spreadsheets/d/14eaHAXJvx8HYq-UMozeoxnGfRpigLLaibStOkYB8MsU/edit?usp=sharing" target="_blank" rel="noopener">
         도서 목록 스프레드시트 열기 ↗
-      </a>
+      </a><br/><br/>
+      🕐 <strong>마지막 업데이트:</strong> <span id="admin-update-time">확인 중...</span>
     </div>
     <button class="btn-refresh" onclick="refreshData()">🔄 도서 목록 새로고침</button>
   </div>
@@ -1243,6 +1244,21 @@ function goRequest() {
 
 // ─── ADMIN MODAL ──────────────────────────────────────────────────
 function openAdminModal() {
+  // 업데이트 시각 표시
+  const timeEl = document.getElementById('admin-update-time');
+  try {
+    const saved = parseInt(localStorage.getItem(CACHE_TIME_KEY) || '0');
+    if (saved) {
+      const d = new Date(saved);
+      const pad = n => String(n).padStart(2, '0');
+      const str = `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      timeEl.textContent = str;
+    } else {
+      timeEl.textContent = '정보 없음';
+    }
+  } catch(_) {
+    timeEl.textContent = '정보 없음';
+  }
   document.getElementById('admin-modal').classList.add('open');
 }
 
