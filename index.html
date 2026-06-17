@@ -961,23 +961,33 @@ function parseBooks(csvText) {
 
 // ─── LOAD DATA ────────────────────────────────────────────────────
 async function fetchWithProxy(url) {
+  // 1차: 직접 fetch (Netlify 배포 환경에서는 대부분 CORS 문제 없이 통과됨)
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (res.ok) {
+      const text = await res.text();
+      if (text.length >= 50 && !text.trim().startsWith('<!')) {
+        return text;
+      }
+    }
+  } catch (_) { /* 다음 단계로 */ }
+
+  // 2차: 프록시 서버들을 순서대로 시도
   const proxies = [
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    `https://r.jina.ai/${url}`,
   ];
   for (const proxy of proxies) {
     try {
-      const res = await fetch(proxy);
+      const res = await fetch(proxy, { cache: 'no-store' });
       if (!res.ok) continue;
       const text = await res.text();
       if (text.length < 50 || text.trim().startsWith('<!')) continue;
       return text;
     } catch (_) { /* 다음 프록시 시도 */ }
   }
-  // 마지막 수단: 직접 fetch (Netlify 배포 후 대부분 통과)
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('direct fetch failed');
-  return res.text();
+  throw new Error('모든 데이터 로드 시도가 실패했습니다');
 }
 
 // ─── CACHE ────────────────────────────────────────────────────────
@@ -1214,7 +1224,8 @@ function showError() {
     <div class="state-box">
       <div class="icon">😢</div>
       <div class="msg">도서 목록을 불러오지 못했어요</div>
-      <div class="sub">잠시 후 다시 시도해 주세요</div>
+      <div class="sub">네트워크 상태를 확인하고 다시 시도해 주세요</div>
+      <button onclick="loadBooks()" style="margin-top:14px;padding:10px 24px;background:var(--sage);color:white;border:none;border-radius:20px;font-family:'Gowun Batang',serif;font-size:14px;cursor:pointer;">🔄 다시 시도</button>
     </div>`;
 }
 
@@ -1471,8 +1482,8 @@ function checkDuplicate() {
       </div>`
     ).join('');
     resultEl.className = 'req-result found';
-    resultEl.innerHTML = `📚 이미 <strong>${found.length}권</strong> 있어요!<div class="found-list">${items}</div>`;
-    btnGo.classList.remove('show');
+    resultEl.innerHTML = `📚 이미 <strong>${found.length}권</strong> 있어요! 찾으시는 책이 아니라면 아래 버튼으로 신청해 주세요.<div class="found-list">${items}</div>`;
+    btnGo.classList.add('show');
   } else {
     resultEl.className = 'req-result not-found';
     resultEl.innerHTML = `✅ 도서관에 없는 책이에요! 아래 버튼을 눌러 신청해 주세요.`;
