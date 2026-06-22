@@ -214,9 +214,37 @@
     .filter-dropdowns {
       display: flex;
       gap: 6px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap; /* 모바일에서 넘치면 줄바꿈 되도록 설정 */
       width: 100%;
       margin-top: 6px;
+    }
+
+    /* ─── CHECKBOX STYLE (영어 원서) ─── */
+    .filter-checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 20px;
+      font-family: 'Gowun Batang', serif;
+      font-size: 13px;
+      background: var(--card-bg);
+      color: var(--text-dark);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .filter-checkbox-wrap:active {
+      background: var(--cream-dark);
+    }
+    .filter-checkbox-wrap input[type="checkbox"] {
+      margin: 0;
+      width: 15px;
+      height: 15px;
+      accent-color: var(--sage);
+      cursor: pointer;
     }
 
     /* ─── KDC 분류 그리드 ─── */
@@ -279,6 +307,7 @@
       background-repeat: no-repeat;
       background-position: right 10px center;
       padding-right: 26px;
+      min-width: 100px;
     }
     select.filter-select:focus { border-color: var(--sage); }
 
@@ -729,7 +758,6 @@
 </head>
 <body>
 
-<!-- ══════════ HEADER ══════════ -->
 <header>
   <div class="header-left">
     <img src="grae.jpg" alt="로고" class="header-logo" onerror="this.style.display='none';document.getElementById('logo-placeholder').style.display='flex';" />
@@ -742,9 +770,7 @@
   <button class="btn-admin" onclick="openAdminModal()" title="관리자">⚙️</button>
 </header>
 
-<!-- ══════════ SEARCH AREA ══════════ -->
 <div class="search-wrap">
-  <!-- 기본 검색창 -->
   <div class="search-row" id="basic-search-row">
     <div class="search-input-wrap">
       <span class="search-icon">🔍</span>
@@ -760,7 +786,6 @@
     <button class="btn-filter" id="btn-filter" onclick="toggleFilter()" title="정밀 필터">🎛️</button>
   </div>
 
-  <!-- 정밀 필터 패널 -->
   <div class="filter-panel" id="filter-panel">
     <div class="filter-panel-inner">
       <div class="filter-search-wrap">
@@ -776,6 +801,7 @@
       <button class="btn-filter-search" onclick="runFilter()">검색</button>
       <button class="btn-filter-close" onclick="closeFilter()">✖️</button>
     </div>
+    
     <div class="filter-dropdowns">
       <select class="filter-select" id="filter-audience" onchange="runFilter()">
         <option value="">모든 대상</option>
@@ -790,7 +816,12 @@
         <option value="alpha">가나다순</option>
         <option value="callnum">청구기호순</option>
       </select>
+      <label class="filter-checkbox-wrap">
+        <input type="checkbox" id="filter-english" onchange="runFilter()" />
+        🇺🇸 영어 원서
+      </label>
     </div>
+    
     <div class="kdc-label">주제 분류</div>
     <div class="kdc-grid" id="kdc-grid">
       <button class="kdc-btn" data-kdc="000" data-color="#5b2d8b" onclick="toggleKdc(this)"><span class="kdc-code">000</span><span class="kdc-name">총류</span></button>
@@ -807,12 +838,10 @@
   </div>
 </div>
 
-<!-- ══════════ STATS BAR ══════════ -->
 <div class="stats-bar" id="stats-bar" style="display:none;">
   총 <span class="count" id="stats-count">0</span>권
 </div>
 
-<!-- ══════════ MAIN ══════════ -->
 <main id="book-list">
   <div class="state-box" id="initial-state">
     <div class="icon">
@@ -824,7 +853,6 @@
   </div>
 </main>
 
-<!-- ══════════ FOOTER ══════════ -->
 <footer>
   <a class="btn-band" href="https://band.us/@graelib" target="_blank" rel="noopener">
     <span class="band-icon">B</span>
@@ -833,7 +861,6 @@
   <button class="btn-request" onclick="openRequestModal()">📬 없는 책 신청하기</button>
 </footer>
 
-<!-- ══════════ REQUEST MODAL ══════════ -->
 <div class="modal-overlay" id="request-modal" onclick="closeModalOnBg(event,'request-modal')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -859,7 +886,6 @@
   </div>
 </div>
 
-<!-- ══════════ ADMIN MODAL ══════════ -->
 <div class="modal-overlay" id="admin-modal" onclick="closeModalOnBg(event,'admin-modal')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -916,7 +942,6 @@ function getSafeStr(val) {
 }
 
 // 컬럼 인덱스 (0-based)
-// 번호,등록번호,서명,저자,서명권차,총서명,저자기호,별치기호,분류기호,청구권차,복본기호,ISBN,딸림자료,출판사,출판년도,...,등록일
 const COL = {
   NO: 0, REG: 1, TITLE: 2, AUTHOR: 3, VOL: 4,
   SERIES: 5, AUTHSYM: 6, LOCATION: 7, CLASS: 8, CLASSNO: 9,
@@ -932,7 +957,6 @@ function parseBooks(csvText) {
     const title = getSafeStr(cols[COL.TITLE]);
     if (!title) continue;
 
-    // 청구기호 조합: 별치기호 / 분류기호 / 저자기호 / 권차 / 복본기호
     const loc     = getSafeStr(cols[COL.LOCATION]);
     const cls     = getSafeStr(cols[COL.CLASS]);
     const authSym = getSafeStr(cols[COL.AUTHSYM]);
@@ -941,7 +965,6 @@ function parseBooks(csvText) {
     const copyStr = (copy && copy !== '1') ? 'c.' + copy : '';
     const callNum = [loc, cls, authSym, clsn, copyStr].filter(Boolean).join(' ');
 
-    // 등록일 → Date 객체
     let regDate = null;
     const rd = getSafeStr(cols[COL.REGDATE]);
     if (rd) regDate = new Date(rd);
@@ -961,7 +984,6 @@ function parseBooks(csvText) {
 
 // ─── LOAD DATA ────────────────────────────────────────────────────
 async function fetchWithProxy(url) {
-  // 1차: 직접 fetch (Netlify 배포 환경에서는 대부분 CORS 문제 없이 통과됨)
   try {
     const res = await fetch(url, { cache: 'no-store' });
     if (res.ok) {
@@ -970,9 +992,8 @@ async function fetchWithProxy(url) {
         return text;
       }
     }
-  } catch (_) { /* 다음 단계로 */ }
+  } catch (_) { }
 
-  // 2차: 프록시 서버들을 순서대로 시도
   const proxies = [
     `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
@@ -985,7 +1006,7 @@ async function fetchWithProxy(url) {
       const text = await res.text();
       if (text.length < 50 || text.trim().startsWith('<!')) continue;
       return text;
-    } catch (_) { /* 다음 프록시 시도 */ }
+    } catch (_) { }
   }
   throw new Error('모든 데이터 로드 시도가 실패했습니다');
 }
@@ -1015,22 +1036,18 @@ async function loadBooks() {
   const cache = loadCache();
 
   if (cache) {
-    // 캐시가 있으면 즉시 표시
     allBooks = parseBooks(cache.text);
     showInitial();
 
-    // 백그라운드에서 최신 데이터 갱신 (캐시가 오래됐거나 항상 갱신)
     fetchWithProxy(CSV_URL).then(text => {
       saveCache(text);
       const fresh = parseBooks(text);
-      // 권수가 달라졌을 때만 allBooks 교체 (검색 중 방해 안 되도록)
       if (fresh.length !== allBooks.length) {
         allBooks = fresh;
         showInitial();
       }
     }).catch(() => {});
   } else {
-    // 캐시 없으면 로딩 표시 후 fetch
     try {
       const text = await fetchWithProxy(CSV_URL);
       saveCache(text);
@@ -1130,11 +1147,9 @@ function renderDonut(containerId, items, total, showTotal) {
       cntEl.textContent = '권수·비율';
       subEl.textContent = '표시';
     }
-    // 범례 opacity
     wrap.querySelectorAll('.chart-legend-item').forEach((el, i) => {
       el.style.opacity = hoveredIdx === null || hoveredIdx === i ? '1' : '0.35';
     });
-    // path opacity
     wrap.querySelectorAll('path[data-idx]').forEach(p => {
       const i = parseInt(p.dataset.idx);
       p.style.opacity = hoveredIdx === null || hoveredIdx === i ? '1' : '0.3';
@@ -1165,7 +1180,6 @@ function renderDonut(containerId, items, total, showTotal) {
 
   updateCenter();
 
-  // 이벤트
   wrap.querySelectorAll('path[data-idx]').forEach(p => {
     p.addEventListener('mouseenter', () => { hoveredIdx = parseInt(p.dataset.idx); updateCenter(); });
     p.addEventListener('mouseleave', () => { hoveredIdx = null; updateCenter(); });
@@ -1233,12 +1247,13 @@ function showError() {
 function matchAudience(book, audience) {
   if (!audience) return true;
   const loc = book.location.toLowerCase();
+  
   if (audience === '유아') return loc.includes('유');
   if (audience === '어린이') return loc.includes('아');
-  if (audience === '유아어린이') return loc.includes('유') || loc.includes('아');
   if (audience === '청소년') return loc.includes('청');
-  if (audience === '성인') return loc === '' || (!loc.includes('유') && !loc.includes('아') && !loc.includes('청') && !loc.includes('만'));
   if (audience === '만화') return loc.includes('만');
+  if (audience === '성인') return loc === '' || (!loc.includes('유') && !loc.includes('아') && !loc.includes('청') && !loc.includes('만'));
+  
   return true;
 }
 
@@ -1255,21 +1270,29 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// 공백을 무시하고 비교하기 위한 정규화 함수
 function normalizeSpace(str) {
   return str.toLowerCase().replace(/\s+/g, '');
 }
 
 function badgeLabel(loc) {
   const l = loc.toLowerCase();
-  if (l.includes('유')) return '유아';
-  if (l.includes('아')) return '어린이';
-  if (l.includes('청')) return '청소년';
-  if (l.includes('만')) return '만화';
-  if (l.includes('빅')) return 'BIG';
-  // 별치기호 없는 경우 → 성인
-  if (l === '') return '';
-  return '';
+  
+  // 영어원서 배지가 가장 먼저 눈에 띄도록 우선 처리
+  let prefix = '';
+  if (l.startsWith('영')) prefix = '🇺🇸영어 - ';
+  
+  let main = '';
+  if (l.includes('유')) main = '유아';
+  else if (l.includes('아')) main = '어린이';
+  else if (l.includes('청')) main = '청소년';
+  else if (l.includes('만')) main = '만화';
+  else if (l.includes('빅')) main = 'BIG';
+  else if (l === '' || l === '영') main = (l === '영' ? '일반' : '');
+
+  // 둘 다 있으면 연결, 없으면 있는 것만
+  if (prefix && main) return prefix + main;
+  if (prefix) return prefix.replace(' - ', ''); // 그냥 '🇺🇸영어' 만 있는 경우
+  return main;
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────
@@ -1339,18 +1362,15 @@ function toggleKdc(btn) {
   const kdc = btn.dataset.kdc;
   const color = btn.dataset.color;
   if (selectedKdc === kdc) {
-    // 선택 해제
     selectedKdc = null;
     btn.classList.remove('active');
     btn.style.background = '';
   } else {
-    // 이전 버튼 초기화
     document.querySelectorAll('.kdc-btn').forEach(b => {
       b.classList.remove('active');
       b.style.background = '';
       b.style.color = '';
     });
-    // 새 버튼 활성화
     selectedKdc = kdc;
     btn.classList.add('active');
     btn.style.background = color;
@@ -1364,7 +1384,6 @@ function toggleFilter() {
   isFilterMode = !isFilterMode;
   const panel = document.getElementById('filter-panel');
   const btnF  = document.getElementById('btn-filter');
-  const basicRow = document.getElementById('basic-search-row');
 
   if (isFilterMode) {
     panel.classList.add('open');
@@ -1396,9 +1415,10 @@ function runFilter() {
   const q        = document.getElementById('filter-input').value.trim();
   const audience = document.getElementById('filter-audience').value;
   const sort     = document.getElementById('filter-sort').value;
+  const engOnly  = document.getElementById('filter-english').checked; // 영어원서 체크박스 상태
 
   // 아무 조건도 없으면 전체 최신순 표시
-  if (!q && !audience && !selectedKdc) {
+  if (!q && !audience && !selectedKdc && !engOnly) {
     const all = [...allBooks].sort((a, b) => {
       if (!a.regDate && !b.regDate) return 0;
       if (!a.regDate) return 1;
@@ -1419,7 +1439,11 @@ function runFilter() {
       b.callNum.replace(/^[^\d]*/, '').match(/^\d+/) &&
       Math.floor(parseInt(b.callNum.replace(/^[^\d]*/, '').match(/^\d+/)[0]) / 100) * 100 === parseInt(selectedKdc)
     );
-    return matchQ && matchAudience(b, audience) && matchKdc;
+    
+    // 영어원서 체크 시 '영'으로 시작하는 별치기호만 통과
+    const matchEng = !engOnly || b.location.startsWith('영');
+
+    return matchQ && matchAudience(b, audience) && matchKdc && matchEng;
   });
 
   if (sort === 'alpha') {
@@ -1451,7 +1475,6 @@ function openRequestModal() {
 function checkDuplicate() {
   const q = document.getElementById('req-input').value.trim();
 
-  // 책 제목을 입력하지 않으면 바로 구글폼으로 이동
   if (!q) {
     goRequest();
     return;
@@ -1462,7 +1485,6 @@ function checkDuplicate() {
     normalizeSpace(b.title).includes(normQ)
   );
 
-  // 제목이 정확히 일치하는 책을 맨 위로, 그 다음 제목이 검색어로 시작하는 책, 나머지는 원래 순서
   found.sort((a, b) => {
     const an = normalizeSpace(a.title);
     const bn = normalizeSpace(b.title);
@@ -1497,7 +1519,6 @@ function goRequest() {
 
 // ─── ADMIN MODAL ──────────────────────────────────────────────────
 function openAdminModal() {
-  // 업데이트 시각 표시
   const timeEl = document.getElementById('admin-update-time');
   try {
     const saved = parseInt(localStorage.getItem(CACHE_TIME_KEY) || '0');
@@ -1516,7 +1537,6 @@ function openAdminModal() {
 }
 
 function refreshData() {
-  // 캐시 삭제 후 강제 새로고침
   try {
     localStorage.removeItem(CACHE_KEY);
     localStorage.removeItem(CACHE_TIME_KEY);
