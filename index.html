@@ -219,7 +219,7 @@
       margin-top: 6px;
     }
 
-    /* ─── CHECKBOX STYLE (원서) ─── */
+    /* ─── CHECKBOX STYLE (영어 원서) ─── */
     .filter-checkbox-wrap {
       display: flex;
       align-items: center;
@@ -516,8 +516,8 @@
     }
 
     /* ─── FOOTER ─── */
-    footer {
-      position: fixed;
+    <footer>
+      <position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
@@ -898,6 +898,14 @@
         도서 목록 스프레드시트 열기 ↗
       </a><br/><br/>
       🕐 <strong>마지막 업데이트:</strong> <span id="admin-update-time">확인 중...</span>
+
+      <hr style="border: 0; border-top: 1.5px dashed var(--cream); margin: 18px 0;" />
+      
+      💡 <strong>앱 관련 피드백</strong><br/>
+      사용 중 불편한 점이나 추가되었으면 하는 기능이 있다면 언제든 편하게 알려주세요!<br/>
+      <a href="https://open.kakao.com/me/mydaddyapple" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: #FEE500; color: #371D1E; padding: 10px 16px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 13.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;" onactive="this.style.transform='scale(0.98)'">
+        💬 카카오톡으로 의견 보내기 ↗
+      </a>
     </div>
     <button class="btn-refresh" onclick="refreshData()">🔄 도서 목록 새로고침</button>
   </div>
@@ -1277,9 +1285,9 @@ function normalizeSpace(str) {
 function badgeLabel(loc) {
   const l = loc.toLowerCase();
   
-  // 영어원서 배지가 가장 먼저 눈에 띄도록 우선 처리
+  // 영어원서 배지가 가장 먼저 눈에 띄도록 우선 처리 (텍스트 수정됨)
   let prefix = '';
-  if (l.startsWith('영')) prefix = '🇺🇸영어 - ';
+  if (l.startsWith('영')) prefix = '🇺🇸원서 - ';
   
   let main = '';
   if (l.includes('유')) main = '유아';
@@ -1291,7 +1299,7 @@ function badgeLabel(loc) {
 
   // 둘 다 있으면 연결, 없으면 있는 것만
   if (prefix && main) return prefix + main;
-  if (prefix) return prefix.replace(' - ', ''); // 그냥 '🇺🇸영어' 만 있는 경우
+  if (prefix) return prefix.replace(' - ', ''); // 그냥 '🇺🇸원서' 만 있는 경우
   return main;
 }
 
@@ -1415,7 +1423,7 @@ function runFilter() {
   const q        = document.getElementById('filter-input').value.trim();
   const audience = document.getElementById('filter-audience').value;
   const sort     = document.getElementById('filter-sort').value;
-  const engOnly  = document.getElementById('filter-english').checked; // 영어원서 체크박스 상태
+  const engOnly  = document.getElementById('filter-english').checked; 
 
   // 아무 조건도 없으면 전체 최신순 표시
   if (!q && !audience && !selectedKdc && !engOnly) {
