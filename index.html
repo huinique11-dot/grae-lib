@@ -2,7 +2,17 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
+  <!-- 화면 배율 및 모바일 최적화 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  <!-- ✨ 모바일 홈 화면 추가(App Icon) 설정 ✨ -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="그래도서관" />
+  <link rel="apple-touch-icon" href="grae.jpg" />
+  <link rel="shortcut icon" href="grae.jpg" />
+  <link rel="icon" type="image/jpeg" href="grae.jpg" />
+
   <title>그래 작은 도서관</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -204,11 +214,7 @@
     /* =========================================
        ✨ AI 감정 큐레이션 (마음 처방전) ✨
        ========================================= */
-    .emotion-banner {
-      margin: 16px 12px 0; padding: 12px 14px; background: linear-gradient(135deg, var(--sage-light), #8ab591);
-      border-radius: 12px; box-shadow: var(--shadow); color: white; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between; transition: transform 0.15s;
-    }
+    .emotion-banner { margin: 16px 12px 0; padding: 12px 14px; background: linear-gradient(135deg, var(--sage-light), #8ab591); border-radius: 12px; box-shadow: var(--shadow); color: white; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: transform 0.15s; }
     .emotion-banner:active { transform: scale(0.98); }
     .emotion-banner-icon { font-size: 24px; margin-right: 10px; }
     .emotion-banner-text { flex: 1; }
@@ -218,12 +224,7 @@
 
     #emotion-modal .modal-sheet { background: var(--cream); border-radius: 24px 24px 0 0; padding: 24px 20px; }
     .emotion-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-    .btn-emotion {
-      background: #fff; border: 1.5px solid var(--cream-dark); border-radius: 12px; padding: 14px 16px;
-      font-family: 'Gowun Batang', serif; font-size: 15px; color: var(--text-dark); font-weight: 700;
-      text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.15s;
-    }
+    .btn-emotion { background: #fff; border: 1.5px solid var(--cream-dark); border-radius: 12px; padding: 14px 16px; font-family: 'Gowun Batang', serif; font-size: 15px; color: var(--text-dark); font-weight: 700; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.15s; }
     .btn-emotion:active { transform: scale(0.98); background: var(--cream-dark); }
     .btn-emotion.loading { pointer-events: none; opacity: 0.7; }
     
@@ -348,9 +349,14 @@
       📋 <strong>도서 목록 수정</strong>은 구글 스프레드시트에서 직접 하시면,<br/>다음 새로고침 시 앱에 자동으로 반영됩니다.<br/><br/>
       🔗 스프레드시트 링크:<br/><a href="https://docs.google.com/spreadsheets/d/14eaHAXJvx8HYq-UMozeoxnGfRpigLLaibStOkYB8MsU/edit?usp=sharing" target="_blank" rel="noopener">도서 목록 스프레드시트 열기 ↗</a><br/><br/>
       🕐 <strong>마지막 업데이트:</strong> <span id="admin-update-time">확인 중...</span>
+      
       <hr style="border: 0; border-top: 1.5px dashed var(--cream); margin: 18px 0;" />
-      💡 <strong>앱 관련 피드백</strong><br/>사용 중 불편한 점이나 추가되었으면 하는 기능이 있다면 언제든 편하게 알려주세요!<br/>
-      <a href="https://open.kakao.com/me/mydaddyapple" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: #FEE500; color: #371D1E; padding: 10px 16px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 13.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;" onactive="this.style.transform='scale(0.98)'">💬 카카오톡으로 의견 보내기 ↗</a>
+      
+      💡 <strong>앱 관련 피드백</strong><br/>
+      사용 중 불편한 점이나 추가되었으면 하는 기능이 있다면 언제든 편하게 알려주세요!<br/>
+      <a href="https://open.kakao.com/me/mydaddyapple" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: #FEE500; color: #371D1E; padding: 10px 16px; border-radius: 20px; text-decoration: none; font-weight: 700; font-size: 13.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;" onactive="this.style.transform='scale(0.98)'">
+        💬 카카오톡으로 의견 보내기 ↗
+      </a>
     </div>
     <button class="btn-refresh" onclick="refreshData()">🔄 도서 목록 새로고침</button>
   </div>
@@ -517,7 +523,6 @@ function showInitial() {
   const listEl = document.getElementById('book-list');
   const total = allBooks.length;
 
-  // ✨ [추가] AI 마음 처방전 배너
   const emotionBannerHtml = `
     <div class="emotion-banner" onclick="openEmotionModal()">
       <div style="display:flex; align-items:center;">
@@ -554,7 +559,6 @@ function showInitial() {
   updateMiniFeed();
 }
 
-// (Donut chart functions omitted for brevity, keeping existing logic)
 const KDC_META = [ { code:'000', label:'총류', color:'#5b2d8b' }, { code:'100', label:'철학', color:'#5a8a2e' }, { code:'200', label:'종교', color:'#cc44aa' }, { code:'300', label:'사회과학',color:'#888888' }, { code:'400', label:'자연과학',color:'#4a7a1e' }, { code:'500', label:'기술과학',color:'#e0a020' }, { code:'600', label:'예술', color:'#9b1b1b' }, { code:'700', label:'언어', color:'#2b4a8b' }, { code:'800', label:'문학', color:'#333333' }, { code:'900', label:'역사', color:'#8B4513' } ];
 const AUD_META = [ { key:'유아', label:'유아', color:'#f4a261' }, { key:'어린이', label:'어린이', color:'#e76f51' }, { key:'청소년', label:'청소년', color:'#2a9d8f' }, { key:'성인', label:'성인', color:'#457b9d' }, { key:'만화', label:'만화', color:'#c8a600' } ];
 function buildDonutPath(items, total, r, cx, cy) { let cum = 0; return items.map(item => { const pct = item.count / total; const gap = 0.025; const s = cum * 2 * Math.PI - Math.PI / 2 + gap; const e = (cum + pct) * 2 * Math.PI - Math.PI / 2 - gap; cum += pct; if (e <= s) return { ...item, d: '', pct }; const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s); const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e); const large = pct > 0.5 ? 1 : 0; return { ...item, d: `M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2}`, pct }; }); }
@@ -568,7 +572,6 @@ function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function normalizeSpace(str) { return str.toLowerCase().replace(/\s+/g, ''); }
 function badgeLabel(loc) { const l = loc.toLowerCase(); let prefix = ''; if (l.startsWith('영')) prefix = '🇺🇸원서 - '; let main = ''; if (l.includes('유')) main = '유아'; else if (l.includes('아')) main = '어린이'; else if (l.includes('청')) main = '청소년'; else if (l.includes('만')) main = '만화'; else if (l.includes('빅')) main = 'BIG'; else if (l === '' || l === '영') main = (l === '영' ? '일반' : ''); if (prefix && main) return prefix + main; if (prefix) return prefix.replace(' - ', ''); return main; }
 
-// 검색결과 그리는 재사용 함수
 function createBookCardHtml(b, query) {
   const metaParts = [b.author, b.publisher, b.year].filter(Boolean);
   const badge = badgeLabel(b.location);
@@ -670,7 +673,6 @@ function submitBookTalk() {
 
 // ─── ✨ AI 감정 큐레이션 기능 ✨ ───────────────────────────────────────────────
 
-// 감정별 매칭 키워드 딕셔너리
 const EMOTION_KEYWORDS = {
   '위로': ['위로', '치유', '눈물', '공감', '따뜻', '수고', '마음', '에세이', '토닥'],
   '휴식': ['휴식', '평온', '잔잔', '여유', '힐링', '소소', '시', '고양이', '느긋'],
@@ -680,7 +682,6 @@ const EMOTION_KEYWORDS = {
 };
 
 function openEmotionModal() {
-  // 결과창 숨기기 & 버튼 상태 초기화
   document.getElementById('emotion-result-wrap').classList.remove('show');
   document.getElementById('emotion-result-list').innerHTML = '';
   document.querySelectorAll('.btn-emotion').forEach(btn => {
@@ -691,7 +692,6 @@ function openEmotionModal() {
 }
 
 function prescribeBooks(emotionKey, btnElement) {
-  // 버튼 로딩 상태 연출
   document.querySelectorAll('.btn-emotion').forEach(b => b.classList.add('loading'));
   btnElement.style.background = 'var(--cream-dark)';
   
@@ -707,7 +707,6 @@ function prescribeBooks(emotionKey, btnElement) {
   setTimeout(() => {
     const keywords = EMOTION_KEYWORDS[emotionKey];
     
-    // 키워드 점수 매기기 로직
     let scoredBooks = allBooks.map(book => {
       let score = 0;
       const t = book.title.toLowerCase();
@@ -715,20 +714,17 @@ function prescribeBooks(emotionKey, btnElement) {
       const p = book.publisher.toLowerCase();
       
       keywords.forEach(kw => {
-        if(t.includes(kw)) score += 3; // 제목에 있으면 가산점
+        if(t.includes(kw)) score += 3;
         if(a.includes(kw)) score += 1;
         if(p.includes(kw)) score += 1;
       });
       return { book, score };
     });
 
-    // 점수가 높은 순으로 정렬
     scoredBooks.sort((a, b) => b.score - a.score);
     
-    // 추천할 책 3권 뽑기 (점수가 0점인 애들은 제외)
     let topBooks = scoredBooks.filter(item => item.score > 0).slice(0, 3).map(item => item.book);
     
-    // 만약 키워드 매칭된 책이 3권이 안 되면, 무작위로 섞어서 채움 (AI 느낌의 무작위 추천)
     if (topBooks.length < 3) {
       const shuffled = [...allBooks].sort(() => 0.5 - Math.random());
       for (let i = 0; i < shuffled.length; i++) {
@@ -737,7 +733,6 @@ function prescribeBooks(emotionKey, btnElement) {
       }
     }
 
-    // 결과 렌더링
     let html = topBooks.map(b => createBookCardHtml(b, "")).join('');
     
     const titles = {
@@ -752,10 +747,9 @@ function prescribeBooks(emotionKey, btnElement) {
     resultList.innerHTML = html;
     resultWrap.classList.add('show');
     
-    // 버튼 로딩 상태 해제
     document.querySelectorAll('.btn-emotion').forEach(b => b.classList.remove('loading'));
 
-  }, 1200); // 1.2초 동안 AI가 분석하는 듯한 연출
+  }, 1200);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────
