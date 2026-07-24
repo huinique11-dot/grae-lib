@@ -421,7 +421,7 @@
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title" style="margin-bottom: 4px;">🔮 AI 마음 날씨 처방전</div>
-    <p style="font-size:13.5px;color:var(--text-mid);line-height:1.5;">오늘 당신의 마음 날씨는 어떤가요?<br/>어울리는 책 3권을 골라드릴게요.</p>
+    <p style="font-size:13.5px;color:var(--text-mid);line-height:1.5;">오늘 당신의 마음 날씨는 어떤가요?<br/>청소년·성인 도서 중에서 5권을 골라드릴게요.</p>
     
     <div class="emotion-grid">
       <button class="btn-emotion" onclick="prescribeBooks('위로', this)">💧 토닥토닥, 위로가 필요한 날</button>
@@ -707,7 +707,13 @@ function prescribeBooks(emotionKey, btnElement) {
   setTimeout(() => {
     const keywords = EMOTION_KEYWORDS[emotionKey];
     
-    let scoredBooks = allBooks.map(book => {
+    // ✨ [수정] 청소년/성인 도서만 필터링 (유아 '유', 어린이 '아', 만화 '만' 제외)
+    const adultTeenBooks = allBooks.filter(book => {
+      const loc = book.location.toLowerCase();
+      return !loc.includes('유') && !loc.includes('아') && !loc.includes('만');
+    });
+
+    let scoredBooks = adultTeenBooks.map(book => {
       let score = 0;
       const t = book.title.toLowerCase();
       const a = book.author.toLowerCase();
@@ -721,25 +727,21 @@ function prescribeBooks(emotionKey, btnElement) {
       return { book, score };
     });
 
-    // 1점 이상 받은 책들만 필터링 (키워드 매칭이 된 책)
     let positiveBooks = scoredBooks.filter(item => item.score > 0);
-    // 점수가 높은 순으로 정렬
     positiveBooks.sort((a, b) => b.score - a.score);
     
-    // 너무 엉뚱한 책이 나오지 않도록, 상위 30권(관련도 높은 책) 후보군 생성
-    let candidatePool = positiveBooks.slice(0, 30);
-    
-    // 후보군을 무작위로 섞기 (누를 때마다 다른 결과!)
+    // 후보군 수 확장 (상위 40권 중 무작위 추출)
+    let candidatePool = positiveBooks.slice(0, 40);
     candidatePool.sort(() => 0.5 - Math.random());
     
-    // 섞인 후보군에서 3권 뽑기
-    let topBooks = candidatePool.slice(0, 3).map(item => item.book);
+    // ✨ [수정] 3권에서 5권으로 추천 수 상향
+    let topBooks = candidatePool.slice(0, 5).map(item => item.book);
     
-    // 만약 후보군 자체가 3권이 안 되면, 전체 도서에서 무작위로 채움
-    if (topBooks.length < 3) {
-      const shuffled = [...allBooks].sort(() => 0.5 - Math.random());
+    // 키워드 매칭 도서가 부족할 때 청소년/성인 도서 풀에서 무작위 채움
+    if (topBooks.length < 5) {
+      const shuffled = [...adultTeenBooks].sort(() => 0.5 - Math.random());
       for (let i = 0; i < shuffled.length; i++) {
-        if (topBooks.length >= 3) break;
+        if (topBooks.length >= 5) break;
         if (!topBooks.includes(shuffled[i])) topBooks.push(shuffled[i]);
       }
     }
