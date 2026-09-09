@@ -179,6 +179,10 @@
     .btn-go-request.show { display: block; }
     .admin-body { background: var(--cream-dark); border-radius: var(--radius-sm); padding: 16px; font-size: 14px; line-height: 1.8; color: var(--text-mid); margin-bottom: 16px; }
     .admin-body a { color: var(--sage-dark); text-decoration: underline; word-break: break-all; }
+    .btn-install { width: 100%; padding: 12px; background: var(--terracotta); color: white; border: none; border-radius: 20px; font-family: 'Gowun Batang', serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-bottom: 10px; }
+    .btn-install:active { background: var(--terracotta-dark); }
+    .install-guide { display: none; background: var(--cream-dark); border-radius: var(--radius-sm); padding: 14px; font-size: 13.5px; line-height: 1.7; color: var(--text-mid); margin-bottom: 10px; }
+    .install-guide.show { display: block; }
     .btn-refresh { width: 100%; padding: 12px; background: var(--sage); color: white; border: none; border-radius: 20px; font-family: 'Gowun Batang', serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .found-list { max-height: 320px; overflow-y: auto; margin-top: 6px; }
     .found-item { padding: 6px 0; border-bottom: 1px solid var(--cream-dark); font-size: 13px; color: var(--text-dark); }
@@ -375,6 +379,8 @@
         💬 카카오톡으로 의견 보내기 ↗
       </a>
     </div>
+    <button class="btn-install" id="btn-install" onclick="promptInstall()">🏠 홈 화면에 추가</button>
+    <div class="install-guide" id="install-guide"></div>
     <button class="btn-refresh" onclick="refreshData()">🔄 도서 목록 새로고침</button>
   </div>
 </div>
@@ -463,6 +469,39 @@ let lastRecentList = [];
 const RECENT_KEY = 'grae_recent_searches';
 const RECENT_MAX = 8;
 const REPORTED_KEY = 'grae_reported_reviews';
+
+// ─── ✨ 홈 화면에 추가(PWA 설치) ✨ ───────────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; });
+window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; });
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
+
+function isStandaloneMode() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
+
+function promptInstall() {
+  const guide = document.getElementById('install-guide');
+  if (isStandaloneMode()) { guide.className = 'install-guide show'; guide.innerHTML = '✅ 이미 홈 화면에 추가되어 있어요!'; return; }
+  if (deferredInstallPrompt) {
+    guide.className = 'install-guide';
+    guide.innerHTML = '';
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.finally(() => { deferredInstallPrompt = null; });
+    return;
+  }
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  let msg;
+  if (isIOS) {
+    msg = '📱 <strong>아이폰(Safari)에서 추가하는 방법</strong><br/>하단 공유 버튼 <strong>⬆️</strong> 을 누른 뒤,<br/>메뉴에서 <strong>\'홈 화면에 추가\'</strong>를 선택해 주세요.';
+  } else if (isAndroid) {
+    msg = '📱 <strong>안드로이드(Chrome)에서 추가하는 방법</strong><br/>오른쪽 위 <strong>⋮</strong> 메뉴를 누른 뒤,<br/><strong>\'앱 설치\'</strong> 또는 <strong>\'홈 화면에 추가\'</strong>를 선택해 주세요.';
+  } else {
+    msg = '💻 브라우저 주소창 오른쪽의 설치 아이콘을 누르거나,<br/>브라우저 메뉴에서 <strong>\'앱 설치\'</strong>를 선택해 주세요.';
+  }
+  guide.className = 'install-guide show';
+  guide.innerHTML = msg;
+}
 
 // ─── CSV PARSER & LOAD ───────────────────────────────────────────────────
 function parseRowSafe(line) {
