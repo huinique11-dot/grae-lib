@@ -78,6 +78,16 @@
     .btn-filter.active { background: var(--sage); border-color: var(--sage); }
     .btn-filter:active { opacity: 0.7; }
 
+    /* ─── RECENT SEARCH ─── */
+    .recent-search-wrap { display: none; padding: 10px 0 0; }
+    .recent-search-wrap.show { display: block; }
+    .recent-search-title { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-light); margin-bottom: 8px; }
+    .recent-clear-btn { font-size: 11px; color: var(--text-light); text-decoration: underline; cursor: pointer; }
+    .recent-search-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .recent-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--card-bg); border: 1.5px solid var(--cream-dark); border-radius: 20px; padding: 6px 8px 6px 12px; font-size: 12.5px; color: var(--text-mid); cursor: pointer; }
+    .recent-chip:active { background: var(--cream-dark); }
+    .rc-remove { color: var(--text-light); font-size: 11px; padding: 2px; }
+
     /* ─── FILTER PANEL ─── */
     .filter-panel { display: none; padding: 10px 0 0; }
     .filter-panel.open { display: block; }
@@ -120,7 +130,7 @@
 
     /* ─── MAIN CONTENT ─── */
     main { padding: 0 12px 160px; }
-    .book-card { background: var(--card-bg); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; box-shadow: var(--shadow); border: 1px solid rgba(122,158,126,0.1); transition: box-shadow 0.2s, transform 0.15s; animation: fadeUp 0.2s ease both; }
+    .book-card { background: var(--card-bg); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; box-shadow: var(--shadow); border: 1px solid rgba(122,158,126,0.1); transition: box-shadow 0.2s, transform 0.15s; animation: fadeUp 0.2s ease both; cursor: pointer; }
     .book-card:active { transform: scale(0.99); box-shadow: none; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .book-title { font-weight: 700; font-size: 15px; color: var(--text-dark); line-height: 1.4; margin-bottom: 4px; }
@@ -151,7 +161,7 @@
     /* ─── MODAL BASE ─── */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(58,46,40,0.45); z-index: 300; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
     .modal-overlay.open { display: flex; }
-    .modal-sheet { background: var(--cream); border-radius: 24px 24px 0 0; width: 100%; max-width: 600px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1); max-height: 90vh; overflow-y: auto; }
+    .modal-sheet { position: relative; background: var(--cream); border-radius: 24px 24px 0 0; width: 100%; max-width: 600px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); animation: slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1); max-height: 90vh; overflow-y: auto; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-handle { width: 36px; height: 4px; background: var(--cream-dark); border-radius: 2px; margin: 0 auto 16px; }
     .modal-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; }
@@ -213,6 +223,29 @@
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #FF4500; }
     .btn-submit-talk { width: 100%; margin-top: 20px; padding: 14px; background: #FF4500; color: #fff; border: 2.5px solid #111; box-shadow: 4px 4px 0px #111; font-family: 'Gowun Batang', serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.1s; }
     .btn-submit-talk:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #111; }
+    .wt-input[readonly] { background: #e5e5e0; color: #555; }
+    .bt-report { position: absolute; top: 10px; right: 10px; font-size: 12px; color: #999; cursor: pointer; padding: 4px; }
+    .bt-report:active { color: #FF4500; }
+
+    /* ─── ✨ 책 상세(별점/리뷰) 모달 ✨ ─── */
+    .bd-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 18px; color: var(--text-light); cursor: pointer; padding: 4px; line-height: 1; }
+    .bd-title { font-size: 17px; font-weight: 700; color: var(--text-dark); line-height: 1.4; padding-right: 26px; margin-bottom: 4px; }
+    .bd-meta { font-size: 13px; color: var(--text-light); margin-bottom: 8px; }
+    .bd-footer { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .bd-rating-row { display: flex; align-items: baseline; gap: 8px; padding: 12px 14px; background: var(--cream-dark); border-radius: var(--radius-sm); margin-bottom: 14px; }
+    .bd-rating-stars { color: var(--terracotta); font-size: 16px; letter-spacing: 1px; }
+    .bd-rating-avg { font-weight: 700; font-size: 15px; color: var(--text-dark); }
+    .bd-rating-count { font-size: 12px; color: var(--text-light); }
+    .btn-bd-write { width: 100%; padding: 12px; background: var(--sage); color: #fff; border: none; border-radius: 20px; font-family: 'Gowun Batang', serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 16px; transition: background 0.2s; }
+    .btn-bd-write:active { background: var(--sage-dark); }
+    .bd-review-list { display: flex; flex-direction: column; gap: 10px; }
+    .bd-review-item { position: relative; background: var(--card-bg); border: 1px solid var(--cream-dark); border-radius: var(--radius-sm); padding: 10px 34px 10px 12px; }
+    .bd-review-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 11.5px; color: var(--text-light); }
+    .bd-review-stars { color: var(--terracotta); letter-spacing: 1px; font-size: 13px; }
+    .bd-review-comment { font-size: 13.5px; color: var(--text-dark); line-height: 1.5; word-break: break-word; }
+    .bd-review-report { position: absolute; top: 8px; right: 8px; font-size: 11px; color: var(--text-light); cursor: pointer; padding: 4px; }
+    .bd-review-report:active { color: var(--terracotta); }
+    .bd-empty { text-align: center; padding: 30px 0; color: var(--text-light); font-size: 13.5px; }
   </style>
 </head>
 <body>
@@ -235,10 +268,12 @@
   <div class="search-row" id="basic-search-row">
     <div class="search-input-wrap">
       <span class="search-icon">🔍</span>
-      <input type="search" class="search-input" id="main-search" placeholder="책 제목 또는 저자를 검색하세요" autocomplete="off" oninput="onMainSearch()" />
+      <input type="search" class="search-input" id="main-search" placeholder="책 제목 또는 저자를 검색하세요" autocomplete="off" oninput="onMainSearch()" onfocus="renderRecentSearches()" onblur="setTimeout(renderRecentSearches, 200)" />
     </div>
     <button class="btn-filter" id="btn-filter" onclick="toggleFilter()" title="정밀 필터">🎛️</button>
   </div>
+
+  <div class="recent-search-wrap" id="recent-search-wrap"></div>
 
   <div class="filter-panel" id="filter-panel">
     <div class="filter-panel-inner">
@@ -364,7 +399,8 @@
     <div class="modal-handle" onclick="closeWriteTalkModal()"></div>
     <div class="modal-title">✍️ 감상 남기기</div>
     <label class="wt-label">어떤 책을 읽으셨나요?</label>
-    <input type="text" id="wt-title" class="wt-input" placeholder="책 제목을 적어주세요" />
+    <input type="text" id="wt-title" class="wt-input" placeholder="책 제목을 적어주세요" maxlength="80" />
+    <input type="hidden" id="wt-bookkey" value="" />
     <div class="wt-row">
       <div>
         <label class="wt-label">닉네임</label>
@@ -393,8 +429,17 @@
       </div>
     </div>
     <label class="wt-label">기억에 남는 문장이나 소감</label>
-    <textarea id="wt-comment" class="wt-input" rows="4" placeholder="자유롭게 적어주세요!" style="resize:none;"></textarea>
+    <textarea id="wt-comment" class="wt-input" rows="4" placeholder="자유롭게 적어주세요!" maxlength="500" style="resize:none;"></textarea>
     <button class="btn-submit-talk" id="btn-submit-talk" onclick="submitBookTalk()">등록하기</button>
+  </div>
+</div>
+
+<!-- ✨ 책 상세 (별점·리뷰) 모달 ✨ -->
+<div class="modal-overlay" id="book-detail-modal" onclick="closeModalOnBg(event,'book-detail-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="bd-close" onclick="document.getElementById('book-detail-modal').classList.remove('open')">✕</button>
+    <div id="bd-content"></div>
   </div>
 </div>
 
@@ -409,6 +454,15 @@ let isFilterMode = false;
 let lastQuery = '';
 let debounceTimer = null;
 let bookTalks = [];
+let currentListBooks = [];
+let currentDetailBook = null;
+let currentDetailReviews = [];
+let currentFeedTalks = [];
+let lastRecentList = [];
+
+const RECENT_KEY = 'grae_recent_searches';
+const RECENT_MAX = 8;
+const REPORTED_KEY = 'grae_reported_reviews';
 
 // ─── CSV PARSER & LOAD ───────────────────────────────────────────────────
 function parseRowSafe(line) {
@@ -444,7 +498,8 @@ function parseBooks(csvText) {
     let regDate = null;
     const rd = getSafeStr(cols[COL.REGDATE]);
     if (rd) regDate = new Date(rd);
-    books.push({ title, author: getSafeStr(cols[COL.AUTHOR]), publisher: getSafeStr(cols[COL.PUBLISHER]), year: getSafeStr(cols[COL.YEAR]), location: loc, callNum, regDate });
+    const isbn = getSafeStr(cols[COL.ISBN]);
+    books.push({ title, author: getSafeStr(cols[COL.AUTHOR]), publisher: getSafeStr(cols[COL.PUBLISHER]), year: getSafeStr(cols[COL.YEAR]), location: loc, callNum, regDate, isbn });
   }
   return books;
 }
@@ -467,11 +522,14 @@ async function loadBooks() {
   if (cache) {
     allBooks = parseBooks(cache.text);
     showInitial();
-    fetchWithProxy(CSV_URL).then(text => {
-      saveCache(text);
-      const fresh = parseBooks(text);
-      if (fresh.length !== allBooks.length) { allBooks = fresh; showInitial(); }
-    }).catch(() => {});
+    // 캐시가 아직 유효하면(1시간 이내) 불필요한 프록시 호출을 하지 않음
+    if (cache.isStale) {
+      fetchWithProxy(CSV_URL).then(text => {
+        saveCache(text);
+        const fresh = parseBooks(text);
+        if (fresh.length !== allBooks.length) { allBooks = fresh; showInitial(); }
+      }).catch(() => {});
+    }
   } else {
     try { const text = await fetchWithProxy(CSV_URL); saveCache(text); allBooks = parseBooks(text); showInitial(); } catch (e) { showError(); }
   }
@@ -515,11 +573,12 @@ function highlight(text, query) { if (!query) return escHtml(text); const escape
 function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function normalizeSpace(str) { return str.toLowerCase().replace(/\s+/g, ''); }
 function badgeLabel(loc) { const l = loc.toLowerCase(); let prefix = ''; if (l.startsWith('영')) prefix = '🇺🇸원서 - '; let main = ''; if (l.includes('유')) main = '유아'; else if (l.includes('아')) main = '어린이'; else if (l.includes('청')) main = '청소년'; else if (l.includes('만')) main = '만화'; else if (l.includes('빅')) main = 'BIG'; else if (l === '' || l === '영') main = (l === '영' ? '일반' : ''); if (prefix && main) return prefix + main; if (prefix) return prefix.replace(' - ', ''); return main; }
+function getBookKey(b) { const isbn = (b.isbn || '').replace(/[-\s]/g, ''); return isbn ? 'isbn:' + isbn : 'ta:' + normalizeSpace(b.title) + '|' + normalizeSpace(b.author); }
 
-function createBookCardHtml(b, query) {
+function createBookCardHtml(b, query, idx) {
   const metaParts = [b.author, b.publisher, b.year].filter(Boolean);
   const badge = badgeLabel(b.location);
-  return `<div class="book-card" style="animation: fadeUp 0.3s ease both;">
+  return `<div class="book-card" onclick="openBookDetail(${idx})" style="animation: fadeUp 0.3s ease both;">
     <div class="book-title">${highlight(b.title, query)}</div>
     <div class="book-meta">${escHtml(metaParts.join(' · '))}</div>
     <div class="book-footer">
@@ -533,13 +592,34 @@ function renderBooks(books, query) {
   const listEl = document.getElementById('book-list');
   const statsEl = document.getElementById('stats-bar');
   const countEl = document.getElementById('stats-count');
+  currentListBooks = books;
   if (!books.length) { listEl.innerHTML = `<div class="state-box"><div class="icon">🔍</div><div class="msg">검색 결과가 없어요</div><div class="sub">다른 키워드로 검색하거나<br/>아래 '없는 책 신청하기'를 눌러 주세요</div></div>`; statsEl.style.display = 'none'; return; }
   countEl.textContent = books.length;
   statsEl.style.display = 'flex';
-  listEl.innerHTML = books.map((b, i) => createBookCardHtml(b, query)).join('');
+  listEl.innerHTML = books.map((b, i) => createBookCardHtml(b, query, i)).join('');
 }
 
-function onMainSearch() { const q = document.getElementById('main-search').value.trim(); clearTimeout(debounceTimer); if (!q) { showInitial(); return; } debounceTimer = setTimeout(() => { lastQuery = q; const normQ = normalizeSpace(q); const filtered = allBooks.filter(b => normalizeSpace(b.title).includes(normQ) || normalizeSpace(b.author).includes(normQ)).sort((a, b) => { if (!a.regDate && !b.regDate) return 0; if (!a.regDate) return 1; if (!b.regDate) return -1; return b.regDate - a.regDate; }); renderBooks(filtered, q); }, 200); }
+function onMainSearch() { const q = document.getElementById('main-search').value.trim(); renderRecentSearches(); clearTimeout(debounceTimer); if (!q) { showInitial(); return; } debounceTimer = setTimeout(() => { lastQuery = q; const normQ = normalizeSpace(q); const filtered = allBooks.filter(b => normalizeSpace(b.title).includes(normQ) || normalizeSpace(b.author).includes(normQ)).sort((a, b) => { if (!a.regDate && !b.regDate) return 0; if (!a.regDate) return 1; if (!b.regDate) return -1; return b.regDate - a.regDate; }); saveRecentSearch(q); renderBooks(filtered, q); }, 200); }
+
+// ─── ✨ 최근 검색어 ✨ ───────────────────────────────────────────────
+function getRecentSearches() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (_) { return []; } }
+function saveRecentSearch(q) { if (!q) return; try { let list = getRecentSearches().filter(x => x !== q); list.unshift(q); list = list.slice(0, RECENT_MAX); localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (_) {} }
+function removeRecentSearch(q) { try { const list = getRecentSearches().filter(x => x !== q); localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (_) {} renderRecentSearches(); }
+function clearRecentSearches() { try { localStorage.removeItem(RECENT_KEY); } catch (_) {} renderRecentSearches(); }
+function applyRecentSearch(q) { const input = document.getElementById('main-search'); input.value = q; onMainSearch(); }
+function renderRecentSearches() {
+  const wrap = document.getElementById('recent-search-wrap');
+  if (!wrap) return;
+  const input = document.getElementById('main-search');
+  const list = getRecentSearches();
+  lastRecentList = list;
+  const shouldShow = document.activeElement === input && !input.value.trim() && list.length > 0;
+  if (!shouldShow) { wrap.classList.remove('show'); wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div class="recent-search-title"><span>최근 검색어</span><span class="recent-clear-btn" data-action="clear-recent">전체 삭제</span></div>
+    <div class="recent-search-list">${list.map((q, i) => `<span class="recent-chip" data-idx="${i}"><span>${escHtml(q)}</span><span class="rc-remove" data-remove-idx="${i}">✕</span></span>`).join('')}</div>`;
+  wrap.classList.add('show');
+}
 let selectedKdc = null;
 function toggleKdc(btn) { const kdc = btn.dataset.kdc; const color = btn.dataset.color; if (selectedKdc === kdc) { selectedKdc = null; btn.classList.remove('active'); btn.style.background = ''; } else { document.querySelectorAll('.kdc-btn').forEach(b => { b.classList.remove('active'); b.style.background = ''; b.style.color = ''; }); selectedKdc = kdc; btn.classList.add('active'); btn.style.background = color; btn.style.color = 'white'; } runFilter(); }
 function toggleFilter() { isFilterMode = !isFilterMode; const panel = document.getElementById('filter-panel'); const btnF = document.getElementById('btn-filter'); if (isFilterMode) { panel.classList.add('open'); btnF.classList.add('active'); document.getElementById('main-search').value = ''; showInitial(); setTimeout(() => document.getElementById('filter-input').focus(), 100); } else { panel.classList.remove('open'); btnF.classList.remove('active'); showInitial(); } }
@@ -563,34 +643,62 @@ async function loadBookTalks() {
   } catch (e) { console.error('북토크 로드 실패:', e); }
 }
 
+// ─── 리뷰 신고(로컬 숨김) ───────────────────────────────────────────
+function talkUid(t) { return normalizeSpace(t.title || '') + '|' + normalizeSpace(t.nickname || '') + '|' + normalizeSpace(t.comment || '') + '|' + (t.rating || ''); }
+function getReportedSet() { try { return new Set(JSON.parse(localStorage.getItem(REPORTED_KEY) || '[]')); } catch (_) { return new Set(); } }
+function isReported(t) { return getReportedSet().has(talkUid(t)); }
+function visibleTalks() { return bookTalks.filter(t => !isReported(t)); }
+function reportReview(t) {
+  if (!confirm('이 리뷰를 신고할까요?\n신고하면 이 리뷰는 이 기기 화면에서 더 이상 보이지 않아요.')) return;
+  try { const set = getReportedSet(); set.add(talkUid(t)); localStorage.setItem(REPORTED_KEY, JSON.stringify([...set])); } catch (_) {}
+  updateMiniFeed();
+  if (document.getElementById('booktalk-modal').classList.contains('open')) renderBookTalkFeed();
+  if (document.getElementById('book-detail-modal').classList.contains('open') && currentDetailBook) renderBookDetailModal(currentDetailBook);
+  alert('신고가 접수되어 이 리뷰가 숨겨졌습니다. 감사합니다!');
+}
+
 function updateMiniFeed() {
   const miniWrap = document.getElementById('mini-booktalk-container');
   if (!miniWrap) return;
-  if (bookTalks.length === 0) {
+  const talks = visibleTalks();
+  if (talks.length === 0) {
     miniWrap.innerHTML = `<div class="mini-booktalk-wrap" onclick="openBookTalkModal()"><div class="mini-booktalk-header"><div class="mini-booktalk-title">💬 실시간 독서 피드</div><div class="mini-booktalk-more">전체보기 ➔</div></div><div class="mini-booktalk-preview" style="color:#666;">아직 작성된 피드가 없어요. 첫 주인공이 되어보세요!</div></div>`;
     return;
   }
-  const latest = bookTalks[0];
+  const latest = talks[0];
   miniWrap.innerHTML = `<div class="mini-booktalk-wrap" onclick="openBookTalkModal()"><div class="mini-booktalk-header"><div class="mini-booktalk-title">💬 방금 올라온 독서 피드</div><div class="mini-booktalk-more">전체보기 ➔</div></div><div class="mini-booktalk-preview">"${escHtml(latest.comment)}"</div><div class="mini-booktalk-meta">${escHtml(latest.title)} | ${escHtml(latest.nickname)} 님</div></div>`;
 }
 
 function renderBookTalkFeed() {
   const container = document.getElementById('bt-feed-container');
-  if(bookTalks.length === 0) { container.innerHTML = `<div style="text-align:center; padding: 40px 0; color: #666; font-weight: 700;">아직 작성된 피드가 없어요.<br/>첫 번째 독서 피드의 주인공이 되어보세요!</div>`; return; }
-  container.innerHTML = bookTalks.map(talk => {
+  const talks = visibleTalks();
+  currentFeedTalks = talks;
+  if (talks.length === 0) { container.innerHTML = `<div style="text-align:center; padding: 40px 0; color: #666; font-weight: 700;">아직 작성된 피드가 없어요.<br/>첫 번째 독서 피드의 주인공이 되어보세요!</div>`; return; }
+  container.innerHTML = talks.map((talk, i) => {
     const rateNum = parseInt(talk.rating) || 5;
     const stars = '★'.repeat(rateNum) + '☆'.repeat(5 - rateNum);
-    return `<div class="bt-card"><div class="bt-book-icon">📕</div><div class="bt-content"><div class="bt-book-title">${escHtml(talk.title)}</div><div class="bt-user-info"><span class="bt-stars">${stars}</span> | ${escHtml(talk.age)} | ${escHtml(talk.nickname)}</div><div class="bt-comment">"${escHtml(talk.comment)}"</div></div></div>`;
+    return `<div class="bt-card"><div class="bt-book-icon">📕</div><div class="bt-content" data-open-book="${i}"><div class="bt-book-title">${escHtml(talk.title)}</div><div class="bt-user-info"><span class="bt-stars">${stars}</span> | ${escHtml(talk.age)} | ${escHtml(talk.nickname)}</div><div class="bt-comment">"${escHtml(talk.comment)}"</div></div><span class="bt-report" data-feed-report="${i}">🚩 신고</span></div>`;
   }).join('');
 }
 
 function openBookTalkModal() { renderBookTalkFeed(); document.getElementById('booktalk-modal').classList.add('open'); }
 function closeBookTalkModal() { document.getElementById('booktalk-modal').classList.remove('open'); }
-function openWriteTalkModal() { document.getElementById('wt-title').value = ''; document.getElementById('wt-nickname').value = ''; document.getElementById('wt-age').selectedIndex = 1; document.getElementById('wt-comment').value = ''; document.getElementById('star5').checked = true; document.getElementById('write-talk-modal').classList.add('open'); }
+function openWriteTalkModal(book) {
+  const titleInput = document.getElementById('wt-title');
+  titleInput.value = book ? book.title : '';
+  titleInput.readOnly = !!book;
+  document.getElementById('wt-bookkey').value = book ? getBookKey(book) : '';
+  document.getElementById('wt-nickname').value = '';
+  document.getElementById('wt-age').selectedIndex = 1;
+  document.getElementById('wt-comment').value = '';
+  document.getElementById('star5').checked = true;
+  document.getElementById('write-talk-modal').classList.add('open');
+}
 function closeWriteTalkModal() { document.getElementById('write-talk-modal').classList.remove('open'); }
 
 function submitBookTalk() {
   const title = document.getElementById('wt-title').value.trim();
+  const bookKey = document.getElementById('wt-bookkey').value;
   const nickname = document.getElementById('wt-nickname').value.trim() || '익명';
   const age = document.getElementById('wt-age').value;
   const comment = document.getElementById('wt-comment').value.trim();
@@ -603,19 +711,99 @@ function submitBookTalk() {
   btn.textContent = "전송 중..."; btn.disabled = true;
 
   const formData = new URLSearchParams();
-  formData.append('title', title); formData.append('nickname', nickname); formData.append('age', age); formData.append('rating', rating); formData.append('comment', comment);
+  formData.append('title', title); formData.append('nickname', nickname); formData.append('age', age); formData.append('rating', rating); formData.append('comment', comment); formData.append('bookKey', bookKey);
 
   fetch(BOOKTALK_URL, { method: "POST", body: formData })
   .then(() => {
-    bookTalks.unshift({ title, nickname, age, rating, comment });
+    bookTalks.unshift({ title, nickname, age, rating, comment, bookKey });
     updateMiniFeed(); renderBookTalkFeed(); closeWriteTalkModal();
+    if (document.getElementById('book-detail-modal').classList.contains('open') && currentDetailBook) renderBookDetailModal(currentDetailBook);
     btn.textContent = "등록하기"; btn.disabled = false;
     alert('감상이 성공적으로 등록되었습니다!');
   })
   .catch(error => { console.error('Error:', error); btn.textContent = "등록하기"; btn.disabled = false; alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.'); });
 }
 
+// ─── ✨ 책 상세(별점·리뷰) ✨ ───────────────────────────────────────
+function getReviewsForBook(book) {
+  const key = getBookKey(book);
+  const normTitle = normalizeSpace(book.title);
+  return visibleTalks().filter(t => t.bookKey ? t.bookKey === key : normalizeSpace(t.title) === normTitle);
+}
+
+function openBookDetail(idx) {
+  const book = currentListBooks[idx];
+  if (!book) return;
+  renderBookDetailModal(book);
+  document.getElementById('book-detail-modal').classList.add('open');
+}
+
+function openBookDetailByTalk(t) {
+  const normTitle = normalizeSpace(t.title);
+  const book = allBooks.find(b => t.bookKey ? getBookKey(b) === t.bookKey : normalizeSpace(b.title) === normTitle);
+  if (!book) { alert('도서 목록에서 이 책을 찾을 수 없어요.'); return; }
+  document.getElementById('booktalk-modal').classList.remove('open');
+  renderBookDetailModal(book);
+  document.getElementById('book-detail-modal').classList.add('open');
+}
+
+function renderBdReviewItem(t, i) {
+  const rateNum = parseInt(t.rating) || 5;
+  const stars = '★'.repeat(rateNum) + '☆'.repeat(5 - rateNum);
+  return `<div class="bd-review-item">
+    <div class="bd-review-head"><span class="bd-review-stars">${stars}</span><span>${escHtml(t.nickname || '익명')} · ${escHtml(t.age || '')}</span></div>
+    <div class="bd-review-comment">${escHtml(t.comment)}</div>
+    <span class="bd-review-report" data-report-idx="${i}">🚩 신고</span>
+  </div>`;
+}
+
+function renderBookDetailModal(book) {
+  currentDetailBook = book;
+  const reviews = getReviewsForBook(book);
+  currentDetailReviews = reviews;
+  const avg = reviews.length ? reviews.reduce((s, t) => s + (parseInt(t.rating) || 0), 0) / reviews.length : 0;
+  const avgRound = Math.round(avg);
+  const starsAvg = avg ? '★'.repeat(avgRound) + '☆'.repeat(5 - avgRound) : '☆☆☆☆☆';
+  const metaParts = [book.author, book.publisher, book.year].filter(Boolean);
+  const badge = badgeLabel(book.location);
+  document.getElementById('bd-content').innerHTML = `
+    <div class="bd-title">${escHtml(book.title)}</div>
+    <div class="bd-meta">${escHtml(metaParts.join(' · '))}</div>
+    <div class="bd-footer">
+      <span class="book-call-number">${escHtml(book.callNum) || '—'}</span>
+      ${badge ? `<span class="book-badge">${badge}</span>` : ''}
+    </div>
+    <div class="bd-rating-row">
+      <span class="bd-rating-stars">${starsAvg}</span>
+      <span class="bd-rating-avg">${avg ? avg.toFixed(1) : '-'}</span>
+      <span class="bd-rating-count">(리뷰 ${reviews.length}개)</span>
+    </div>
+    <button class="btn-bd-write" data-bd-write>✍️ 이 책 리뷰 남기기</button>
+    <div class="bd-review-list">
+      ${reviews.length ? reviews.map((t, i) => renderBdReviewItem(t, i)).join('') : `<div class="bd-empty">아직 리뷰가 없어요. 첫 리뷰를 남겨보세요!</div>`}
+    </div>`;
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────
+document.getElementById('recent-search-wrap').addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('[data-remove-idx]');
+  if (removeBtn) { e.stopPropagation(); removeRecentSearch(lastRecentList[parseInt(removeBtn.dataset.removeIdx)]); return; }
+  if (e.target.closest('[data-action="clear-recent"]')) { clearRecentSearches(); return; }
+  const chip = e.target.closest('.recent-chip');
+  if (chip) applyRecentSearch(lastRecentList[parseInt(chip.dataset.idx)]);
+});
+document.getElementById('bd-content').addEventListener('click', (e) => {
+  if (e.target.closest('[data-bd-write]')) { openWriteTalkModal(currentDetailBook); return; }
+  const reportBtn = e.target.closest('[data-report-idx]');
+  if (reportBtn) { const t = currentDetailReviews[parseInt(reportBtn.dataset.reportIdx)]; if (t) reportReview(t); }
+});
+document.getElementById('bt-feed-container').addEventListener('click', (e) => {
+  const reportBtn = e.target.closest('[data-feed-report]');
+  if (reportBtn) { const t = currentFeedTalks[parseInt(reportBtn.dataset.feedReport)]; if (t) reportReview(t); return; }
+  const openBtn = e.target.closest('[data-open-book]');
+  if (openBtn) { const t = currentFeedTalks[parseInt(openBtn.dataset.openBook)]; if (t) openBookDetailByTalk(t); }
+});
+
 loadBooks();
 loadBookTalks();
 </script>
