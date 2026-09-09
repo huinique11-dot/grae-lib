@@ -9,9 +9,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="그래도서관" />
-  <link rel="apple-touch-icon" href="grae.jpg" />
-  <link rel="shortcut icon" href="grae.jpg" />
-  <link rel="icon" type="image/jpeg" href="grae.jpg" />
+  <meta name="theme-color" content="#7a9e7e" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+  <link rel="shortcut icon" href="icon-192.png" />
 
   <title>그래 작은 도서관</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -210,27 +213,6 @@
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #FF4500; }
     .btn-submit-talk { width: 100%; margin-top: 20px; padding: 14px; background: #FF4500; color: #fff; border: 2.5px solid #111; box-shadow: 4px 4px 0px #111; font-family: 'Gowun Batang', serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.1s; }
     .btn-submit-talk:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #111; }
-
-    /* =========================================
-       ✨ AI 감정 큐레이션 (마음 처방전) ✨
-       ========================================= */
-    .emotion-banner { margin: 16px 12px 0; padding: 12px 14px; background: linear-gradient(135deg, var(--sage-light), #8ab591); border-radius: 12px; box-shadow: var(--shadow); color: white; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: transform 0.15s; }
-    .emotion-banner:active { transform: scale(0.98); }
-    .emotion-banner-icon { font-size: 24px; margin-right: 10px; }
-    .emotion-banner-text { flex: 1; }
-    .emotion-banner-title { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
-    .emotion-banner-sub { font-size: 12px; opacity: 0.9; }
-    .emotion-banner-arrow { font-size: 16px; font-weight: bold; }
-
-    #emotion-modal .modal-sheet { background: var(--cream); border-radius: 24px 24px 0 0; padding: 24px 20px; }
-    .emotion-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-    .btn-emotion { background: #fff; border: 1.5px solid var(--cream-dark); border-radius: 12px; padding: 14px 16px; font-family: 'Gowun Batang', serif; font-size: 15px; color: var(--text-dark); font-weight: 700; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.15s; }
-    .btn-emotion:active { transform: scale(0.98); background: var(--cream-dark); }
-    .btn-emotion.loading { pointer-events: none; opacity: 0.7; }
-    
-    .emotion-result-wrap { margin-top: 20px; display: none; }
-    .emotion-result-wrap.show { display: block; animation: fadeUp 0.3s ease; }
-    .emotion-result-title { font-size: 15px; font-weight: 700; color: var(--sage-dark); margin-bottom: 12px; text-align: center; }
   </style>
 </head>
 <body>
@@ -416,29 +398,6 @@
   </div>
 </div>
 
-<!-- ✨ 감정 큐레이션 (마음 날씨) 모달 ✨ -->
-<div class="modal-overlay" id="emotion-modal" onclick="closeModalOnBg(event,'emotion-modal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title" style="margin-bottom: 4px;">🔮 AI 마음 날씨 처방전</div>
-    <p style="font-size:13.5px;color:var(--text-mid);line-height:1.5;">오늘 당신의 마음 날씨는 어떤가요?<br/>청소년·성인 도서 중에서 5권을 골라드릴게요.</p>
-    
-    <div class="emotion-grid">
-      <button class="btn-emotion" onclick="prescribeBooks('위로', this)">💧 토닥토닥, 위로가 필요한 날</button>
-      <button class="btn-emotion" onclick="prescribeBooks('휴식', this)">☕ 생각은 멈추고 푹 쉬고 싶은 날</button>
-      <button class="btn-emotion" onclick="prescribeBooks('자극', this)">⚡ 일상에 짜릿한 자극이 필요한 날</button>
-      <button class="btn-emotion" onclick="prescribeBooks('설렘', this)">💗 몽글몽글 설렘을 느끼고 싶은 날</button>
-      <button class="btn-emotion" onclick="prescribeBooks('성장', this)">🌱 새로운 용기와 자극을 얻고 싶은 날</button>
-    </div>
-
-    <!-- 결과 표시 영역 -->
-    <div class="emotion-result-wrap" id="emotion-result-wrap">
-      <div class="emotion-result-title" id="emotion-result-title">이런 책은 어때요?</div>
-      <div id="emotion-result-list"></div>
-    </div>
-  </div>
-</div>
-
 <script>
 // ─── CONFIG & DATA ───────────────────────────────────────────────────────
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR9wF1ojhJI8CwEpJPjk3xkUiOB5gxTpFtsaKGZ08j-kvksuv9NzJSl_GEp01J15W4uSzRkOUF_P4QP/pub?gid=1825971218&single=true&output=csv';
@@ -523,22 +482,7 @@ function showInitial() {
   const listEl = document.getElementById('book-list');
   const total = allBooks.length;
 
-  const emotionBannerHtml = `
-    <div class="emotion-banner" onclick="openEmotionModal()">
-      <div style="display:flex; align-items:center;">
-        <div class="emotion-banner-icon">🔮</div>
-        <div class="emotion-banner-text">
-          <div class="emotion-banner-title">AI 마음 날씨 처방전</div>
-          <div class="emotion-banner-sub">오늘 기분에 맞는 책을 추천해 드릴게요</div>
-        </div>
-      </div>
-      <div class="emotion-banner-arrow">➔</div>
-    </div>
-  `;
-
   listEl.innerHTML = `
-    ${emotionBannerHtml}
-    
     <div style="text-align:center;padding:14px 0 10px;font-size:13px;color:var(--text-light)">
       총 <strong style="color:var(--sage-dark);font-size:15px">${total.toLocaleString()}권</strong>의 도서가 있어요
     </div>
@@ -669,100 +613,6 @@ function submitBookTalk() {
     alert('감상이 성공적으로 등록되었습니다!');
   })
   .catch(error => { console.error('Error:', error); btn.textContent = "등록하기"; btn.disabled = false; alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.'); });
-}
-
-// ─── ✨ AI 감정 큐레이션 기능 ✨ ───────────────────────────────────────────────
-
-const EMOTION_KEYWORDS = {
-  '위로': ['위로', '치유', '눈물', '공감', '따뜻', '수고', '마음', '에세이', '토닥'],
-  '휴식': ['휴식', '평온', '잔잔', '여유', '힐링', '소소', '시', '고양이', '느긋'],
-  '자극': ['몰입', '반전', '순삭', '도파민', '스릴러', '추리', '미스터리', '살인', '마법'],
-  '설렘': ['설렘', '사랑', '다정', '관계', '감성', '낭만', '로맨스', '연애', '우정'],
-  '성장': ['성장', '동기부여', '인사이트', '지혜', '새출발', '용기', '습관', '부자', '공부']
-};
-
-function openEmotionModal() {
-  document.getElementById('emotion-result-wrap').classList.remove('show');
-  document.getElementById('emotion-result-list').innerHTML = '';
-  document.querySelectorAll('.btn-emotion').forEach(btn => {
-    btn.classList.remove('loading');
-    btn.style.background = '#fff';
-  });
-  document.getElementById('emotion-modal').classList.add('open');
-}
-
-function prescribeBooks(emotionKey, btnElement) {
-  document.querySelectorAll('.btn-emotion').forEach(b => b.classList.add('loading'));
-  btnElement.style.background = 'var(--cream-dark)';
-  
-  const resultWrap = document.getElementById('emotion-result-wrap');
-  const resultList = document.getElementById('emotion-result-list');
-  const titleEl = document.getElementById('emotion-result-title');
-  
-  resultWrap.classList.remove('show');
-  resultList.innerHTML = `<div class="loading-dots" style="margin: 20px auto; display:flex; justify-content:center;"><span></span><span></span><span></span></div>`;
-  titleEl.innerHTML = `AI가 8,900권 중에서 책을 고르고 있습니다...`;
-  resultWrap.style.display = 'block';
-
-  setTimeout(() => {
-    const keywords = EMOTION_KEYWORDS[emotionKey];
-    
-    // ✨ [수정] 청소년/성인 도서만 필터링 (유아 '유', 어린이 '아', 만화 '만' 제외)
-    const adultTeenBooks = allBooks.filter(book => {
-      const loc = book.location.toLowerCase();
-      return !loc.includes('유') && !loc.includes('아') && !loc.includes('만');
-    });
-
-    let scoredBooks = adultTeenBooks.map(book => {
-      let score = 0;
-      const t = book.title.toLowerCase();
-      const a = book.author.toLowerCase();
-      const p = book.publisher.toLowerCase();
-      
-      keywords.forEach(kw => {
-        if(t.includes(kw)) score += 3;
-        if(a.includes(kw)) score += 1;
-        if(p.includes(kw)) score += 1;
-      });
-      return { book, score };
-    });
-
-    let positiveBooks = scoredBooks.filter(item => item.score > 0);
-    positiveBooks.sort((a, b) => b.score - a.score);
-    
-    // 후보군 수 확장 (상위 40권 중 무작위 추출)
-    let candidatePool = positiveBooks.slice(0, 40);
-    candidatePool.sort(() => 0.5 - Math.random());
-    
-    // ✨ [수정] 3권에서 5권으로 추천 수 상향
-    let topBooks = candidatePool.slice(0, 5).map(item => item.book);
-    
-    // 키워드 매칭 도서가 부족할 때 청소년/성인 도서 풀에서 무작위 채움
-    if (topBooks.length < 5) {
-      const shuffled = [...adultTeenBooks].sort(() => 0.5 - Math.random());
-      for (let i = 0; i < shuffled.length; i++) {
-        if (topBooks.length >= 5) break;
-        if (!topBooks.includes(shuffled[i])) topBooks.push(shuffled[i]);
-      }
-    }
-
-    let html = topBooks.map(b => createBookCardHtml(b, "")).join('');
-    
-    const titles = {
-      '위로': '💧 마음을 다독여 줄 따뜻한 책들이에요.',
-      '휴식': '☕ 복잡한 생각을 잠재워 줄 잔잔한 책들이에요.',
-      '자극': '⚡ 첫 장을 넘기면 멈출 수 없는 책들이에요.',
-      '설렘': '💗 마음을 몽글몽글하게 만들어 줄 책들이에요.',
-      '성장': '🌱 당신의 새로운 시작을 응원하는 책들이에요.'
-    };
-
-    titleEl.innerHTML = titles[emotionKey];
-    resultList.innerHTML = html;
-    resultWrap.classList.add('show');
-    
-    document.querySelectorAll('.btn-emotion').forEach(b => b.classList.remove('loading'));
-
-  }, 1200);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────
