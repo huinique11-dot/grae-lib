@@ -250,6 +250,27 @@
     .bd-review-report { position: absolute; top: 8px; right: 8px; font-size: 11px; color: var(--text-light); cursor: pointer; padding: 4px; }
     .bd-review-report:active { color: var(--terracotta); }
     .bd-empty { text-align: center; padding: 30px 0; color: var(--text-light); font-size: 13.5px; }
+
+    /* ─── ✨ 읽고 싶은 책(찜) ✨ ─── */
+    .header-actions { display: flex; align-items: center; gap: 2px; }
+    .btn-wishlist { position: relative; }
+    .wish-count { position: absolute; top: 0; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--terracotta); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; font-family: sans-serif; display: none; }
+    .wish-count.show { display: block; }
+    .book-card { position: relative; }
+    .book-card .book-title { padding-right: 30px; }
+    .btn-wish { position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 19px; line-height: 1; padding: 4px; cursor: pointer; color: var(--text-light); transition: transform 0.15s; }
+    .btn-wish:active { transform: scale(1.25); }
+    .btn-wish.on { color: var(--terracotta); }
+    .btn-bd-wish { width: 100%; padding: 11px; background: var(--card-bg); color: var(--terracotta-dark); border: 1.5px solid var(--terracotta-light); border-radius: 20px; font-family: 'Gowun Batang', serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 10px; transition: background 0.2s; }
+    .btn-bd-wish.on { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
+    .wish-sub { font-size: 12px; color: var(--text-light); text-align: center; margin: -8px 0 14px; }
+    .wish-list { display: flex; flex-direction: column; gap: 8px; }
+    .wish-item { position: relative; background: var(--card-bg); border: 1px solid var(--cream-dark); border-radius: var(--radius-sm); padding: 11px 40px 11px 12px; cursor: pointer; }
+    .wish-item:active { background: var(--cream-dark); }
+    .wish-item.missing { opacity: 0.6; cursor: default; }
+    .wish-item-title { font-size: 14.5px; font-weight: 700; color: var(--text-dark); line-height: 1.4; margin-bottom: 3px; }
+    .wish-item-meta { font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+    .wish-item-remove { position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 14px; color: var(--text-light); cursor: pointer; padding: 4px 6px; }
   </style>
 </head>
 <body>
@@ -264,7 +285,10 @@
       <span class="main">그래 작은 도서관</span>
     </div>
   </div>
-  <button class="btn-admin" onclick="openAdminModal()" title="관리자">⚙️</button>
+  <div class="header-actions">
+    <button class="btn-admin btn-wishlist" onclick="openWishlistModal()" title="읽고 싶은 책">🔖<span class="wish-count" id="wish-count"></span></button>
+    <button class="btn-admin" onclick="openAdminModal()" title="관리자">⚙️</button>
+  </div>
 </header>
 
 <!-- ══════════ SEARCH AREA ══════════ -->
@@ -449,6 +473,17 @@
   </div>
 </div>
 
+<!-- ✨ 읽고 싶은 책 모달 ✨ -->
+<div class="modal-overlay" id="wishlist-modal" onclick="closeModalOnBg(event,'wishlist-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="bd-close" onclick="document.getElementById('wishlist-modal').classList.remove('open')">✕</button>
+    <div class="modal-title">🔖 읽고 싶은 책</div>
+    <div class="wish-sub">이 기기에 저장돼요. 책을 누르면 상세 정보를 볼 수 있어요.</div>
+    <div class="wish-list" id="wish-list"></div>
+  </div>
+</div>
+
 <script>
 // ─── CONFIG & DATA ───────────────────────────────────────────────────────
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR9wF1ojhJI8CwEpJPjk3xkUiOB5gxTpFtsaKGZ08j-kvksuv9NzJSl_GEp01J15W4uSzRkOUF_P4QP/pub?gid=1825971218&single=true&output=csv';
@@ -469,6 +504,8 @@ let lastRecentList = [];
 const RECENT_KEY = 'grae_recent_searches';
 const RECENT_MAX = 8;
 const REPORTED_KEY = 'grae_reported_reviews';
+const WISHLIST_KEY = 'grae_wishlist';
+let currentWishItems = [];
 
 // ─── ✨ 홈 화면에 추가(PWA 설치) ✨ ───────────────────────────────────
 let deferredInstallPrompt = null;
@@ -617,7 +654,9 @@ function getBookKey(b) { const isbn = (b.isbn || '').replace(/[-\s]/g, ''); retu
 function createBookCardHtml(b, query, idx) {
   const metaParts = [b.author, b.publisher, b.year].filter(Boolean);
   const badge = badgeLabel(b.location);
+  const wished = isWished(b);
   return `<div class="book-card" onclick="openBookDetail(${idx})" style="animation: fadeUp 0.3s ease both;">
+    <button class="btn-wish${wished ? ' on' : ''}" onclick="event.stopPropagation(); toggleWishByIdx(${idx}, this)" title="읽고 싶은 책">${wished ? '♥' : '♡'}</button>
     <div class="book-title">${highlight(b.title, query)}</div>
     <div class="book-meta">${escHtml(metaParts.join(' · '))}</div>
     <div class="book-footer">
@@ -817,11 +856,67 @@ function renderBookDetailModal(book) {
       <span class="bd-rating-avg">${avg ? avg.toFixed(1) : '-'}</span>
       <span class="bd-rating-count">(리뷰 ${reviews.length}개)</span>
     </div>
+    <button class="btn-bd-wish${isWished(book) ? ' on' : ''}" data-bd-wish>${isWished(book) ? '♥ 읽고 싶은 책에 담겼어요' : '♡ 읽고 싶은 책에 담기'}</button>
     <button class="btn-bd-write" data-bd-write>✍️ 이 책 리뷰 남기기</button>
     <div class="bd-review-list">
       ${reviews.length ? reviews.map((t, i) => renderBdReviewItem(t, i)).join('') : `<div class="bd-empty">아직 리뷰가 없어요. 첫 리뷰를 남겨보세요!</div>`}
     </div>`;
 }
+
+// ─── ✨ 읽고 싶은 책(찜) — 이 기기 localStorage에 저장 ✨ ─────────────
+function getWishlist() { try { const list = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]'); return Array.isArray(list) ? list : []; } catch (_) { return []; } }
+function saveWishlist(list) { try { localStorage.setItem(WISHLIST_KEY, JSON.stringify(list)); } catch (_) { alert('저장 공간이 부족해 읽고 싶은 책을 저장하지 못했어요.'); } }
+function isWished(book) { const key = getBookKey(book); return getWishlist().some(w => w.key === key); }
+function toggleWish(book) {
+  if (!book) return false;
+  const key = getBookKey(book);
+  let list = getWishlist();
+  const wished = list.some(w => w.key === key);
+  if (wished) list = list.filter(w => w.key !== key);
+  // 도서 목록이 바뀌어도 표시할 수 있도록 기본 정보를 함께 저장
+  else list.unshift({ key, title: book.title, author: book.author, publisher: book.publisher, year: book.year, callNum: book.callNum, location: book.location, addedAt: Date.now() });
+  saveWishlist(list);
+  updateWishCount();
+  return !wished;
+}
+function toggleWishByIdx(idx, btn) {
+  const on = toggleWish(currentListBooks[idx]);
+  if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '♥' : '♡'; }
+}
+function updateWishCount() {
+  const el = document.getElementById('wish-count');
+  const n = getWishlist().length;
+  el.textContent = n > 99 ? '99+' : n;
+  el.classList.toggle('show', n > 0);
+}
+// 상세/찜 목록에서 바뀐 상태를 현재 검색 결과 카드에도 반영
+function refreshWishButtons() {
+  document.querySelectorAll('#book-list .btn-wish').forEach((btn, i) => {
+    const b = currentListBooks[i]; if (!b) return;
+    const on = isWished(b); btn.classList.toggle('on', on); btn.textContent = on ? '♥' : '♡';
+  });
+}
+function renderWishlist() {
+  const wrap = document.getElementById('wish-list');
+  const list = getWishlist();
+  currentWishItems = list.map(w => ({ ...w, book: allBooks.find(b => getBookKey(b) === w.key) || null }));
+  if (!list.length) { wrap.innerHTML = `<div class="bd-empty">아직 담은 책이 없어요.<br/>책 카드의 ♡ 를 눌러 담아 보세요!</div>`; return; }
+  wrap.innerHTML = currentWishItems.map((w, i) => {
+    const b = w.book || w;
+    const metaParts = [b.author, b.publisher, b.year].filter(Boolean);
+    const badge = badgeLabel(b.location || '');
+    return `<div class="wish-item${w.book ? '' : ' missing'}" data-wish-open="${i}">
+      <div class="wish-item-title">${escHtml(b.title)}</div>
+      <div class="wish-item-meta">${escHtml(metaParts.join(' · '))}</div>
+      <div class="book-footer">
+        ${w.book ? `<span class="book-call-number">${escHtml(b.callNum) || '—'}</span>` : `<span class="book-badge">도서 목록에서 찾을 수 없어요</span>`}
+        ${w.book && badge ? `<span class="book-badge">${badge}</span>` : ''}
+      </div>
+      <button class="wish-item-remove" data-wish-remove="${i}" title="빼기">✕</button>
+    </div>`;
+  }).join('');
+}
+function openWishlistModal() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('open'); }
 
 // ─── INIT ─────────────────────────────────────────────────────────
 document.getElementById('recent-search-wrap').addEventListener('click', (e) => {
@@ -833,6 +928,7 @@ document.getElementById('recent-search-wrap').addEventListener('click', (e) => {
 });
 document.getElementById('bd-content').addEventListener('click', (e) => {
   if (e.target.closest('[data-bd-write]')) { openWriteTalkModal(currentDetailBook); return; }
+  if (e.target.closest('[data-bd-wish]')) { toggleWish(currentDetailBook); renderBookDetailModal(currentDetailBook); refreshWishButtons(); return; }
   const reportBtn = e.target.closest('[data-report-idx]');
   if (reportBtn) { const t = currentDetailReviews[parseInt(reportBtn.dataset.reportIdx)]; if (t) reportReview(t); }
 });
@@ -843,6 +939,21 @@ document.getElementById('bt-feed-container').addEventListener('click', (e) => {
   if (openBtn) { const t = currentFeedTalks[parseInt(openBtn.dataset.openBook)]; if (t) openBookDetailByTalk(t); }
 });
 
+document.getElementById('wish-list').addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('[data-wish-remove]');
+  if (removeBtn) {
+    const w = currentWishItems[parseInt(removeBtn.dataset.wishRemove)];
+    if (w) { saveWishlist(getWishlist().filter(x => x.key !== w.key)); updateWishCount(); renderWishlist(); refreshWishButtons(); }
+    return;
+  }
+  const item = e.target.closest('[data-wish-open]');
+  if (item) {
+    const w = currentWishItems[parseInt(item.dataset.wishOpen)];
+    if (w && w.book) { document.getElementById('wishlist-modal').classList.remove('open'); renderBookDetailModal(w.book); document.getElementById('book-detail-modal').classList.add('open'); }
+  }
+});
+
+updateWishCount();
 loadBooks();
 loadBookTalks();
 </script>
